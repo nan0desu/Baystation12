@@ -81,3 +81,29 @@ mob/living/carbon/human/proc/handle_pain()
 			maxdam = dam
 	if(damaged_organ)
 		pain(damaged_organ.display_name, maxdam, 0)
+
+	// Damage to internal organs hurts a lot.
+	for(var/organ_name in internal_organs)
+		var/datum/organ/internal/I = internal_organs[organ_name]
+		if(I.damage > 2) if(prob(2))
+			var/datum/organ/external/parent = get_organ(I.parent_organ)
+			src.custom_pain("You feel a sharp pain in your [parent.display_name]", 1)
+
+	var/toxDamageMessage = null
+	var/toxMessageProb = 1
+	switch(getToxLoss())
+		if(1 to 5)
+			toxMessageProb = 1
+			toxDamageMessage = "Your body stings slightly."
+		if(6 to 10)
+			toxMessageProb = 2
+			toxDamageMessage = "Your whole body hurts a little."
+		if(11 to 15)
+			toxMessageProb = 2
+			toxDamageMessage = "Your whole body hurts."
+		else
+			toxMessageProb = 5
+			toxDamageMessage = "Your body aches all over, it's driving you mad."
+
+	if(toxDamageMessage && prob(toxMessageProb))
+		src.custom_pain(toxDamageMessage, getToxLoss() >= 15)

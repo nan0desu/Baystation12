@@ -155,6 +155,16 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 						//At this point, we dun care which blood we are adding to, as long as they get more blood.
 						B.volume = B.volume + 0.1 // regenerate blood VERY slowly
 
+			// Damaged heart virtually reduces the blood volume, as the blood isn't
+			// being pumped properly anymore.
+			var/datum/organ/internal/heart/heart = internal_organs["heart"]
+			switch(heart.damage)
+				if(5 to 10)
+					blood_volume *= 0.8
+				if(11 to 20)
+					blood_volume *= 0.5
+				if(21 to INFINITY)
+					blood_volume *= 0.3
 
 			switch(blood_volume)
 				if(BLOOD_VOLUME_SAFE to 10000)
@@ -251,7 +261,8 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 		if (disabilities & NERVOUS)
 			if (prob(10))
 				stuttering = max(10, stuttering)
-		if (getBrainLoss() >= 60 && stat != 2)
+		// No. -- cib
+		/*if (getBrainLoss() >= 60 && stat != 2)
 			if (prob(3))
 				switch(pick(1,2,3))
 					if(1)
@@ -260,6 +271,25 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 						say(pick("FUS RO DAH","fucking 4rries!", "stat me", ">my face", "roll it easy!", "waaaaaagh!!!", "red wonz go fasta", "FOR TEH EMPRAH", "lol2cat", "dem dwarfs man, dem dwarfs", "SPESS MAHREENS", "hwee did eet fhor khayosss", "lifelike texture ;_;", "luv can bloooom", "PACKETS!!!"))
 					if(3)
 						emote("drool")
+		*/
+
+		if(stat != 2)
+			var/rn = rand(0, 200)
+			if(getBrainLoss() >= 5)
+				if(0 <= rn && rn <= 3)
+					custom_pain("Your head feels numb and painful.")
+			if(getBrainLoss() >= 15)
+				if(4 <= rn && rn <= 6) if(eye_blurry <= 0)
+					src << "\red It becomes hard to see for some reason."
+					eye_blurry = 10
+			if(getBrainLoss() >= 35)
+				if(7 <= rn && rn <= 9) if(hand && equipped())
+					src << "\red Your hand won't respond properly, you drop what you're holding."
+					drop_item()
+			if(getBrainLoss() >= 50)
+				if(10 <= rn && rn <= 12) if(!lying)
+					src << "\red Your legs won't respond properly, you fall down."
+					lying = 1
 
 	proc/handle_organs()
 		// take care of organ related updates, such as broken and missing limbs
@@ -1043,6 +1073,22 @@ var/const/BLOOD_VOLUME_SURVIVE = 122
 			// add chemistry traces to a random organ
 			var/datum/organ/O = pick(organs)
 			O.trace_chemicals[A.name] = 100
+
+		var/damaged_liver_process_accuracy = 10
+		if(life_tick % damaged_liver_process_accuracy == 0)
+			// Damaged liver means some chemicals are very dangerous
+			var/datum/organ/internal/liver/liver = internal_organs["liver"]
+			if(liver.damage >= liver.min_bruised_damage)
+				for(var/datum/reagent/R in src.reagents.reagent_list)
+					// Ethanol and all drinks are bad
+					if(istype(R, /datum/reagent/ethanol))
+						adjustToxLoss(0.1 * damaged_liver_process_accuracy)
+
+				// Can't cope with toxins at all
+				for(var/toxin in list("toxin", "plasma", "sacid", "pacid", "cyanide", "lexorin", "amatoxin", "chloralhydrate", "carpotoxin", "zombiepowder", "mindbreaker"))
+					if(src.reagents.has_reagent(toxin))
+						adjustToxLoss(0.3 * damaged_liver_process_accuracy)
+
 
 		updatehealth()
 
