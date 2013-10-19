@@ -34,7 +34,8 @@
 	var/obj/item/gloves = null
 	var/obj/item/glasses = null
 	var/obj/item/head = null
-	var/obj/item/ears = null
+	var/obj/item/l_ear = null
+	var/obj/item/r_ear = null
 	var/obj/item/wear_id = null
 	var/obj/item/r_store = null
 	var/obj/item/l_store = null
@@ -46,9 +47,6 @@
 
 	var/icon/stand_icon = null
 	var/icon/lying_icon = null
-
-	var/list/organs = list() //Gets filled up in the constructor (human.dm, New() proc, line 24. I'm sick and tired of missing comments. -Agouri
-	var/list/organs_by_name = list() // map organ names to organs
 
 	var/miming = null //Toggle for the mime's abilities.
 	var/special_voice = "" // For changing our voice. Used by a symptom.

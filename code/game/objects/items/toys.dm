@@ -556,6 +556,7 @@
 	name = "toy phazon"
 	desc = "Mini-Mecha action figure! Collect them all! 11/11."
 	icon_state = "phazonprize"
+
 /obj/item/toy/katana
 	name = "replica katana"
 	desc = "Woefully underpowered in D20."
@@ -569,6 +570,7 @@
 	w_class = 3
 	attack_verb = list("attacked", "slashed", "stabbed", "sliced")
 
+/* NYET.
 /obj/item/weapon/toddler
 	icon_state = "toddler"
 	name = "toddler"
@@ -576,3 +578,4 @@
 	force = 5
 	w_class = 4.0
 	slot_flags = SLOT_BACK
+*/

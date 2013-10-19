@@ -63,6 +63,15 @@ obj/item/weapon/gun/energy/staff
 
 	update_icon()
 		return
+
+
+	click_empty(mob/user = null)
+		if (user)
+			user.visible_message("*fizzle*", "\red <b>*fizzle*</b>")
+		else
+			src.visible_message("*fizzle*")
+		playsound(src.loc, 'sound/effects/sparks1.ogg', 100, 1)
+
 /obj/item/weapon/gun/energy/staff/animate
 	name = "staff of animation"
 	desc = "An artefact that spits bolts of life-force which causes objects which are hit by it to animate and come to life! This magic doesn't affect machines."
@@ -166,3 +175,22 @@ obj/item/weapon/gun/energy/staff
 	icon_state = "xray"
 	projectile_type = "/obj/item/projectile/beam/mindflayer"
 	fire_sound = 'sound/weapons/Laser.ogg'
+
+obj/item/weapon/gun/energy/staff/focus
+	name = "mental focus"
+	desc = "An artefact that channels the will of the user into destructive bolts of force. If you aren't careful with it, you might poke someone's brain out."
+	icon = 'icons/obj/wizard.dmi'
+	icon_state = "focus"
+	item_state = "focus"
+	projectile_type = "/obj/item/projectile/forcebolt"
+	/*
+	attack_self(mob/living/user as mob)
+		if(projectile_type == "/obj/item/projectile/forcebolt")
+			charge_cost = 200
+			user << "\red The [src.name] will now strike a small area."
+			projectile_type = "/obj/item/projectile/forcebolt/strong"
+		else
+			charge_cost = 100
+			user << "\red The [src.name] will now strike only a single person."
+			projectile_type = "/obj/item/projectile/forcebolt"
+	*/

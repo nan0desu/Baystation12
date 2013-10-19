@@ -12,6 +12,7 @@
 	icon_state ="bookEngineering"
 	author = "Engineering Encyclopedia"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "Station Repairs and Construction"
+
 	dat = {"
 
 		<html><head>
@@ -25,12 +26,12 @@
 
 		"}
 
+
 /obj/item/weapon/book/manual/engineering_particle_accelerator
 	name = "Particle Accelerator User's Guide"
 	icon_state ="bookParticleAccelerator"
 	author = "Engineering Encyclopedia"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "Particle Accelerator User's Guide"
-//big pile of shit below.
 
 	dat = {"<html>
 				<head>
@@ -73,7 +74,6 @@
 	icon_state ="bookHacking"
 	author = "Engineering Encyclopedia"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "Hacking"
-//big pile of shit below.
 
 	dat = {"
 
@@ -81,19 +81,19 @@
 		</head>
 
 		<body>
-		<iframe width='100%' height='97%' src="http://wiki.nanotrasen.com/index.php?title=Hacking&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
+		<iframe width='100%' height='97%' src="http://baystation12.net/wiki/index.php?title=Hacking&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>
 		</body>
 
 		</html>
 
 		"}
 
+
 /obj/item/weapon/book/manual/engineering_singularity_safety
 	name = "Singularity Safety in Special Circumstances"
 	icon_state ="bookEngineeringSingularitySafety"
 	author = "Engineering Encyclopedia"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "Singularity Safety in Special Circumstances"
-//big pile of shit below.
 
 	dat = {"<html>
 				<head>
@@ -136,11 +136,13 @@
 				</html>
 				"}
 
+
 /obj/item/weapon/book/manual/hydroponics_pod_people
-	name = "The Human Harvest - From seed to market"
+	name = "The Diona Harvest - From seed to market"
 	icon_state ="bookHydroponicsPodPeople"
 	author = "Farmer John"
-	title = "The Human Harvest - From seed to market"
+	title = "The Diona Harvest - From seed to market"
+
 	dat = {"<html>
 				<head>
 				<style>
@@ -152,17 +154,13 @@
 				</style>
 				</head>
 				<body>
-				<h3>Growing Humans</h3>
+				<h3>Growing Diona</h3>
 
-				Why would you want to grow humans? Well I'm expecting most readers to be in the slave trade, but a few might actually
-				want to revive fallen comrades. Growing pod people is easy, but prone to disaster.
+				Growing Diona is easy!
 				<p>
 				<ol>
-				<li>Find a dead person who is in need of cloning. </li>
-				<li>Take a blood sample with a syringe. </li>
-				<li>Inject a seed pack with the blood sample. </li>
 				<li>Plant the seeds. </li>
-				<li>Tend to the plants water and nutrition levels until it is time to harvest the cloned human.</li>
+				<li>Tend to the plants water and nutrition levels until it is time to harvest the Diona.</li>
 				</ol>
 				<p>
 				It really is that easy! Good luck!
@@ -171,12 +169,12 @@
 				</html>
 				"}
 
+
 /obj/item/weapon/book/manual/medical_cloning
 	name = "Cloning techniques of the 26th century"
 	icon_state ="bookCloning"
 	author = "Medical Journal, volume 3"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "Cloning techniques of the 26th century"
-//big pile of shit below.
 
 	dat = {"<html>
 				<head>
@@ -202,7 +200,7 @@
 					<li><a href='#6'>Get clean Structurel Enzymes for the body</a></li>
 					<li><a href='#7'>Put body in morgue</a></li>
 					<li><a href='#8'>Await cloned body</a></li>
-					<li><a href='#9'>Use the clean SW injector</a></li>
+					<li><a href='#9'>Cryo and use the clean SE injector</a></li>
 					<li><a href='#10'>Give person clothes back</a></li>
 					<li><a href='#11'>Send person on their way</a></li>
 				</ol>
@@ -231,8 +229,8 @@
 				<a name='8'><H4>Step 8: Await cloned body</H4>
 				Now go back to the lab and wait for your patient to be cloned. It won’t be long now, I promise.
 
-				<a name='9'><H4>Step 9: Use the clean SE injector on person</H4>
-				Has your body been cloned yet? Great! As soon as the guy pops out, grab your injector and jab it in them. Once you’ve injected them, they now have clean Structural Enzymes and their defects, if any, will disappear in a short while.
+				<a name='9'><H4>Step 9: Cyo and clean clean SE injector on person</H4>
+				Has your body been cloned yet? Great! As soon as the guy pops out, grab them and stick them in cryo. Clonexadone and Cryoxadone help rebuild their genetic material. Then grab your cleanr SE injector and jab it in them. Once you’ve injected them, they now have clean Structural Enzymes and their defects, if any, will disappear in a short while.
 
 				<a name='10'><H4>Step 10: Give person clothes back</H4>
 				Obviously the person will be naked after they have been cloned. Provided you weren’t an irresponsible little shit, you should have protected their possessions from thieves and should be able to give them back to the patient. No matter how cruel you are, it’s simply against protocol to force your patients to walk outside naked.
@@ -241,8 +239,6 @@
 				Give the patient one last check-over - make sure they don’t still have any defects and that they have all their possessions. Ask them how they died, if they know, so that you can report any foul play over the radio. Once you’re done, your patient is ready to go back to work! Chances are they do not have Medbay access, so you should let them out of Genetics and the Medbay main entrance.
 
 				<p>If you’ve gotten this far, congratulations! You have mastered the art of cloning. Now, the real problem is how to resurrect yourself after that traitor had his way with you for cloning his target.
-
-
 
 				</body>
 				</html>
@@ -254,7 +250,6 @@
 	icon_state ="book"
 	author = "Weyland-Yutani Corp"		 // Who wrote the thing, can be changed by pen or PC. It is not automatically assigned
 	title = "APLU \"Ripley\" Construction and Operation Manual"
-//big pile of shit below.
 
 	dat = {"<html>
 				<head>
@@ -320,8 +315,6 @@
 				</body>
 				</html>
 
-				<h2>Operation</h2>
-				Coming soon...
 			"}
 
 
@@ -330,6 +323,7 @@
 	icon_state = "rdbook"
 	author = "Dr. L. Ight"
 	title = "Research and Development 101"
+
 	dat = {"<html>
 				<head>
 				<style>
@@ -380,6 +374,7 @@
 	icon_state = "borgbook"
 	author = "XISC"
 	title = "Cyborgs for Dummies"
+
 	dat = {"<html>
 				<head>
 				<style>
@@ -577,12 +572,14 @@
 		</html>
 		"}
 
+
 /obj/item/weapon/book/manual/security_space_law
 	name = "Space Law"
 	desc = "A set of Nanotrasen guidelines for keeping law and order on their space stations."
 	icon_state = "bookSpaceLaw"
 	author = "Nanotrasen"
 	title = "Space Law"
+
 	dat = {"
 
 		<html><head>
@@ -595,18 +592,20 @@
 
 		"}
 
+
 /obj/item/weapon/book/manual/engineering_guide
 	name = "Engineering Textbook"
 	icon_state ="bookEngineering2"
 	author = "Engineering Encyclopedia"
 	title = "Engineering Textbook"
+
 	dat = {"
 
 		<html><head>
 		</head>
 
 		<body>
-		<iframe width='100%' height='97%' src="http://wiki.nanotrasen.com/index.php?title=Guide_to_engineering&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>		</body>
+		<iframe width='100%' height='97%' src="http://baystation12.net/wiki/index.php?title=Guide_to_Engineering&printable=yes&remove_links=1" frameborder="0" id="main_frame"></iframe>		</body>
 
 		</html>
 
@@ -618,6 +617,7 @@
 	icon_state = "cooked_book"
 	author = "Lord Frenrir Cageth"
 	title = "Chef Recipes"
+
 	dat = {"<html>
 				<head>
 				<style>
@@ -665,11 +665,13 @@
 				</html>
 			"}
 
+
 /obj/item/weapon/book/manual/barman_recipes
 	name = "Barman Recipes"
 	icon_state = "barbook"
 	author = "Sir John Rose"
 	title = "Barman Recipes"
+
 	dat = {"<html>
 				<head>
 				<style>
@@ -723,6 +725,7 @@
 	icon_state ="bookDetective"
 	author = "Nanotrasen"
 	title = "The Film Noir: Proper Procedures for Investigations"
+
 	dat = {"<html>
 			<head>
 			<style>
@@ -764,6 +767,7 @@
 	icon_state ="bookNuclear"
 	author = "Syndicate"
 	title = "Fission Mailed: Nuclear Sabotage 101"
+
 	dat = {"<html>
 			Nuclear Explosives 101:<br>
 			Hello and thank you for choosing the Syndicate for your nuclear information needs.<br>

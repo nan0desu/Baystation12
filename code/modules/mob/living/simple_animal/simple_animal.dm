@@ -9,7 +9,6 @@
 	var/icon_gib = null	//We only try to show a gibbing animation if this exists.
 
 	var/list/speak = list()
-	var/list/speak_emote = list()//	Emotes while speaking IE: Ian [emote], [text] -- Ian barks, "WOOF!". Spoken text is generated from the speak variable.
 	var/speak_chance = 0
 	var/list/emote_hear = list()	//Hearable emotes
 	var/list/emote_see = list()		//Unlike speak_emote, the list of things in this variable only show by themselves with no spoken text. IE: Ian barks, Ian yaps
@@ -96,7 +95,7 @@
 		AdjustParalysis(-1)
 
 	//Movement
-	if(!client && !stop_automated_movement && wander)
+	if(!client && !stop_automated_movement && wander && !anchored)
 		if(isturf(src.loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
 			turns_since_move++
 			if(turns_since_move >= turns_per_move)
@@ -217,21 +216,10 @@
 			new meat_type(src.loc)
 	..()
 
-/mob/living/simple_animal/say_quote(var/text)
-	if(speak_emote && speak_emote.len)
-		var/emote = pick(speak_emote)
-		if(emote)
-			return "[emote], \"[text]\""
-	return "says, \"[text]\"";
-
-/mob/living/simple_animal/emote(var/act)
+/mob/living/simple_animal/emote(var/act, var/type, var/desc)
 	if(act)
-		if(act == "scream")	act = "makes a loud and pained whimper" //ugly hack to stop animals screaming when crushed :P
-		if( findtext(act,".",lentext(act)) == 0 && findtext(act,"!",lentext(act)) == 0 && findtext(act,"?",lentext(act)) == 0 )
-			act = addtext(act,".") //Makes sure all emotes end with a period.
-		for (var/mob/O in viewers(src, null))
-			O.show_message("<B>[src]</B> [act]")
-
+		if(act == "scream")	act = "whimper" //ugly hack to stop animals screaming when crushed :P
+		..(act, type, desc)
 
 /mob/living/simple_animal/attack_animal(mob/living/simple_animal/M as mob)
 	if(M.melee_damage_upper == 0)

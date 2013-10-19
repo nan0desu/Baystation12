@@ -30,6 +30,15 @@
 	var/tmp/told_cant_shoot = 0 //So that it doesn't spam them with the fact they cannot hit them.
 	var/firerate = 1 	// 0 for one bullet after tarrget moves and aim is lowered,
 						//1 for keep shooting until aim is lowered
+	var/fire_delay = 6
+	var/last_fired = 0
+
+	proc/ready_to_fire()
+		if(world.time >= last_fired + fire_delay)
+			last_fired = world.time
+			return 1
+		else
+			return 0
 
 	proc/load_into_chamber()
 		return 0
@@ -85,6 +94,11 @@
 		return
 
 	if(!special_check(user))
+		return
+
+	if (!ready_to_fire())
+		if (world.time % 3) //to prevent spam
+			user << "<span class='warning'>[src] is not ready to fire again!"
 		return
 
 	if(!load_into_chamber()) //CHECK
@@ -143,6 +157,12 @@
 	else
 		user.update_inv_r_hand()
 
+/obj/item/weapon/gun/proc/can_fire()
+	return load_into_chamber()
+
+/obj/item/weapon/gun/proc/can_hit(var/mob/living/target as mob, var/mob/living/user as mob)
+	return in_chamber.check_fire(target,user)
+
 /obj/item/weapon/gun/proc/click_empty(mob/user = null)
 	if (user)
 		user.visible_message("*click click*", "\red <b>*click*</b>")
@@ -161,16 +181,18 @@
 			mouthshoot = 0
 			return
 		if (load_into_chamber())
-			user.visible_message("<span class = 'warning'>[user] pulls the trigger. Ow.</span>")
+			user.visible_message("<span class = 'warning'>[user] pulls the trigger.</span>")
 			if(silenced)
 				playsound(user, fire_sound, 10, 1)
 			else
 				playsound(user, fire_sound, 50, 1)
 			in_chamber.on_hit(M)
-			if (!in_chamber.nodamage)
+			if (in_chamber.damage_type != HALLOSS)
 				user.apply_damage(in_chamber.damage*2.5, in_chamber.damage_type, "head", used_weapon = "Point blank shot in the mouth with \a [in_chamber]")
+				user.death()
 			else
-				user << "<span class = 'notice'>You feel dumb for trying this...</span>"
+				user << "<span class = 'notice'>Ow...</span>"
+				user.apply_effect(110,AGONY,0)
 			del(in_chamber)
 			mouthshoot = 0
 			return

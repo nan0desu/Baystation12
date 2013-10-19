@@ -8,7 +8,7 @@
 /obj/machinery/shield_gen
 	name = "shield generator"
 	desc = "Machine that generates an impenetrable field of energy when activated."
-	icon = 'shielding.dmi'
+	icon = 'code/WorkInProgress/Cael_Aislinn/ShieldGen/shielding.dmi'
 	icon_state = "generator0"
 	var/active = 0
 	var/field_radius = 3
@@ -150,11 +150,10 @@
 				var/strength_change = target_field_strength - E.strength
 				if(strength_change > stored_renwicks)
 					strength_change = stored_renwicks
-				if(E.strength >= 1)
-					E.Strengthen(strength_change)
-				else if(E.strength < 0)
+				if(E.strength < 0)
 					E.strength = 0
-					E.Strengthen(0.1)
+				else
+					E.Strengthen(strength_change)
 
 				stored_renwicks -= strength_change
 

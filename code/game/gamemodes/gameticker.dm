@@ -39,7 +39,8 @@ var/global/datum/controller/gameticker/ticker
 /datum/controller/gameticker/proc/pregame()
 	login_music = pick(\
 	'sound/music/space.ogg',\
-	'sound/music/traitor.ogg')
+	'sound/music/traitor.ogg',\
+	'sound/music/space_oddity.ogg') //Ground Control to Major Tom, this song is cool, what's going on?
 	do
 		pregame_timeleft = 180
 		world << "<B><FONT color='blue'>Welcome to the pre-game lobby!</FONT></B>"
@@ -107,7 +108,7 @@ var/global/datum/controller/gameticker/ticker
 
 	//setup the money accounts
 	if(!centcomm_account_db)
-		for(var/obj/machinery/account_database/check_db in world)
+		for(var/obj/machinery/account_database/check_db in machines)
 			if(check_db.z == 2)
 				centcomm_account_db = check_db
 				break
@@ -141,7 +142,7 @@ var/global/datum/controller/gameticker/ticker
 		if(C.holder)
 			admins_number++
 	if(admins_number == 0)
-		send2irc("Server", "Round just started with no admins online!")
+		send2adminirc("Round has started with no admins online.")
 
 	supply_shuttle.process() 		//Start the supply shuttle regenerating points -- TLE
 	master_controller.process()		//Start master_controller.process()
@@ -264,6 +265,8 @@ var/global/datum/controller/gameticker/ticker
 				if(player.mind.assigned_role=="AI")
 					player.close_spawn_windows()
 					player.AIize()
+				else if(!player.mind.assigned_role)
+					continue
 				else
 					player.create_character()
 					del(player)

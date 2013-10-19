@@ -24,6 +24,7 @@ datum/controller/game_controller
 	var/objects_cost	= 0
 	var/networks_cost	= 0
 	var/powernets_cost	= 0
+	var/nano_cost		= 0
 	var/events_cost		= 0
 	var/ticker_cost		= 0
 	var/total_cost		= 0
@@ -38,12 +39,6 @@ datum/controller/game_controller/New()
 			del(master_controller)
 		master_controller = src
 
-	createRandomZlevel()
-
-	if(!air_master)
-		air_master = new /datum/controller/air_system()
-		air_master.setup()
-
 	if(!job_master)
 		job_master = new /datum/controller/occupations()
 		job_master.SetupOccupations()
@@ -52,12 +47,20 @@ datum/controller/game_controller/New()
 
 	if(!syndicate_code_phrase)		syndicate_code_phrase	= generate_code_phrase()
 	if(!syndicate_code_response)	syndicate_code_response	= generate_code_phrase()
-	if(!ticker)						ticker = new /datum/controller/gameticker()
 	if(!emergency_shuttle)			emergency_shuttle = new /datum/shuttle_controller/emergency_shuttle()
-
 
 datum/controller/game_controller/proc/setup()
 	world.tick_lag = config.Ticklag
+
+	spawn(20)
+		createRandomZlevel()
+
+	if(!air_master)
+		air_master = new /datum/controller/air_system()
+		air_master.Setup()
+
+	if(!ticker)
+		ticker = new /datum/controller/gameticker()
 
 	setup_objects()
 	setupgenetics()
@@ -71,6 +74,9 @@ datum/controller/game_controller/proc/setup()
 		if(ticker)
 			ticker.pregame()
 
+	lighting_controller.Initialize()
+
+
 datum/controller/game_controller/proc/setup_objects()
 	world << "\red \b Initializing objects"
 	sleep(-1)
@@ -79,12 +85,12 @@ datum/controller/game_controller/proc/setup_objects()
 
 	world << "\red \b Initializing pipe networks"
 	sleep(-1)
-	for(var/obj/machinery/atmospherics/machine in world)
+	for(var/obj/machinery/atmospherics/machine in machines)
 		machine.build_network()
 
 	world << "\red \b Initializing atmos machinery."
 	sleep(-1)
-	for(var/obj/machinery/atmospherics/unary/U in world)
+	for(var/obj/machinery/atmospherics/unary/U in machines)
 		if(istype(U, /obj/machinery/atmospherics/unary/vent_pump))
 			var/obj/machinery/atmospherics/unary/vent_pump/T = U
 			T.broadcast_status()
@@ -113,28 +119,25 @@ datum/controller/game_controller/proc/process()
 				controller_iteration++
 
 				vote.process()
+				process_newscaster()
 
 				//AIR
 
 				if(!air_processing_killed)
 					timer = world.timeofday
 					last_thing_processed = air_master.type
-					air_master.tick()
-					air_cost = (world.timeofday - timer) / 10				// this might make atmos slower
-				//  1. atmos won't process if the game is generally lagged out(no deadlocks)
-				//  2. if the server frequently crashes during atmos processing we will knowif(!kill_air)
-					//src.set_debug_state("Air Master")
 
-					air_master.current_cycle++
-					var/success = air_master.tick() //Changed so that a runtime does not crash the ticker.
-					if(!success) //Runtimed.
-						log_adminwarn("ZASALERT: air_system/tick() failed: [air_master.tick_progress]")
+					if(!air_master.Tick()) //Runtimed.
 						air_master.failed_ticks++
 						if(air_master.failed_ticks > 5)
 							world << "<font color='red'><b>RUNTIMES IN ATMOS TICKER.  Killing air simulation!</font></b>"
-							kill_air = 1
+							world.log << "### ZAS SHUTDOWN"
+							message_admins("ZASALERT: unable to run [air_master.tick_progress], shutting down!")
+							log_admin("ZASALERT: unable run zone/process() -- [air_master.tick_progress]")
+							air_processing_killed = 1
 							air_master.failed_ticks = 0
-				air_cost = (world.timeofday - timer) / 10
+
+					air_cost = (world.timeofday - timer) / 10
 
 				sleep(breather_ticks)
 
@@ -189,6 +192,13 @@ datum/controller/game_controller/proc/process()
 
 				sleep(breather_ticks)
 
+				//NANO UIS
+				timer = world.timeofday
+				process_nano()
+				nano_cost = (world.timeofday - timer) / 10
+				
+				sleep(breather_ticks)
+
 				//EVENTS
 				timer = world.timeofday
 				process_events()
@@ -201,7 +211,7 @@ datum/controller/game_controller/proc/process()
 				ticker_cost = (world.timeofday - timer) / 10
 
 				//TIMING
-				total_cost = air_cost + sun_cost + mobs_cost + diseases_cost + machines_cost + objects_cost + networks_cost + powernets_cost + events_cost + ticker_cost
+				total_cost = air_cost + sun_cost + mobs_cost + diseases_cost + machines_cost + objects_cost + networks_cost + powernets_cost + nano_cost + events_cost + ticker_cost
 
 				var/end_time = world.timeofday
 				if(end_time < start_time)
@@ -278,6 +288,16 @@ datum/controller/game_controller/proc/process_powernets()
 			i++
 			continue
 		powernets.Cut(i,i+1)
+
+datum/controller/game_controller/proc/process_nano()
+	var/i = 1
+	while(i<=nanomanager.processing_uis.len)
+		var/datum/nanoui/ui = nanomanager.processing_uis[i]
+		if(ui && ui.src_object && ui.user)
+			ui.process()
+			i++
+			continue
+		nanomanager.processing_uis.Cut(i,i+1)
 
 datum/controller/game_controller/proc/process_events()
 	last_thing_processed = /datum/event

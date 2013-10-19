@@ -20,7 +20,7 @@
 	changelog_hash = md5('html/changelog.html')					//used for telling if the changelog has changed recently
 
 	if(byond_version < RECOMMENDED_VERSION)
-		world.log << "Your server's byond version does not meet the recommended requirements for TGstation code. Please update BYOND"
+		world.log << "Your server's byond version does not meet the recommended requirements for this server. Please update BYOND"
 
 	make_datum_references_lists()	//initialises global lists for referencing frequently used datums (so that we only ever do it once)
 
@@ -60,9 +60,9 @@
 		world.log << "Feedback database connection established."
 
 	if(!setup_old_database_connection())
-		world.log << "Your server failed to establish a connection with the tgstation database."
+		world.log << "Your server failed to establish a connection with the SQL database."
 	else
-		world.log << "Tgstation database connection established."
+		world.log << "SQL database connection established."
 
 	plmaster = new /obj/effect/overlay()
 	plmaster.icon = 'icons/effects/tile_effects.dmi'
@@ -78,14 +78,18 @@
 
 	src.update_status()
 
+	. = ..()
+
+	sleep_offline = 1
+
+	send2mainirc("Server starting up on [config.server? "byond://[config.server]" : "byond://[world.address]:[world.port]"]")
+
 	master_controller = new /datum/controller/game_controller()
-	spawn(-1)
+	spawn(1)
 		master_controller.setup()
-		lighting_controller.Initialize()
 
 	process_teleport_locs()			//Sets up the wizard teleport locations
 	process_ghost_teleport_locs()	//Sets up ghost teleport locations.
-	sleep_offline = 1
 
 	spawn(3000)		//so we aren't adding to the round-start lag
 		if(config.ToRban)
@@ -153,9 +157,9 @@
 
 
 /world/Reboot(var/reason)
-	spawn(0)
+	/*spawn(0)
 		world << sound(pick('sound/AI/newroundsexy.ogg','sound/misc/apcdestroyed.ogg','sound/misc/bangindonk.ogg')) // random end sounds!! - LastyBatsy
-
+		*/
 	for(var/client/C in clients)
 		if(config.server)	//if you set a server location in config.txt, it sends you there instead of trying to reconnect to the same world address. -- NeoFite
 			C << link("byond://[config.server]")
@@ -306,6 +310,7 @@ proc/setup_database_connection()
 		failed_db_connections = 0	//If this connection succeeded, reset the failed connections counter.
 	else
 		failed_db_connections++		//If it failed, increase the failed connections counter.
+		world.log << dbcon.ErrorMsg()
 
 	return .
 
@@ -343,6 +348,7 @@ proc/setup_old_database_connection()
 		failed_old_db_connections = 0	//If this connection succeeded, reset the failed connections counter.
 	else
 		failed_old_db_connections++		//If it failed, increase the failed connections counter.
+		world.log << dbcon.ErrorMsg()
 
 	return .
 

@@ -1,7 +1,7 @@
 //Define all tape types in policetape.dm
 /obj/item/taperoll
 	name = "tape roll"
-	icon = 'policetape.dmi'
+	icon = 'icons/policetape.dmi'
 	icon_state = "rollstart"
 	flags = FPRINT
 	w_class = 1.0
@@ -12,7 +12,7 @@
 
 /obj/item/tape
 	name = "tape"
-	icon = 'policetape.dmi'
+	icon = 'icons/policetape.dmi'
 	anchored = 1
 	density = 1
 	var/icon_base
@@ -72,6 +72,8 @@
 		while (cur!=end && can_place)
 			if(cur.density == 1)
 				can_place = 0
+			else if (istype(cur, /turf/space))
+				can_place = 0
 			else
 				for(var/obj/O in cur)
 					if(!istype(O, /obj/item/tape) && O.density)
@@ -95,7 +97,7 @@
 	//is_blocked_turf(var/turf/T)
 		usr << "\blue You finish placing the [src]."	//Git Test
 
-/obj/item/taperoll/police/afterattack(var/atom/A, mob/user as mob)
+/obj/item/taperoll/afterattack(var/atom/A, mob/user as mob)
 	if (istype(A, /obj/machinery/door/airlock))
 		var/turf/T = get_turf(A)
 		var/obj/item/tape/P = new tape_type(T.x,T.y,T.z)

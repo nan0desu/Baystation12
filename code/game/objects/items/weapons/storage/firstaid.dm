@@ -30,7 +30,7 @@
 		icon_state = pick("ointment","firefirstaid")
 
 		new /obj/item/device/healthanalyzer( src )
-		new /obj/item/weapon/reagent_containers/syringe/inaprovaline( src )
+		new /obj/item/weapon/reagent_containers/hypospray/autoinjector( src )
 		new /obj/item/stack/medical/ointment( src )
 		new /obj/item/stack/medical/ointment( src )
 		new /obj/item/weapon/reagent_containers/pill/kelotane( src )
@@ -51,7 +51,7 @@
 		new /obj/item/stack/medical/ointment(src)
 		new /obj/item/stack/medical/ointment(src)
 		new /obj/item/device/healthanalyzer(src)
-		new /obj/item/weapon/reagent_containers/syringe/inaprovaline( src )
+		new /obj/item/weapon/reagent_containers/hypospray/autoinjector( src )
 		return
 
 /obj/item/weapon/storage/firstaid/toxin
@@ -88,11 +88,28 @@
 		new /obj/item/weapon/reagent_containers/pill/dexalin( src )
 		new /obj/item/weapon/reagent_containers/pill/dexalin( src )
 		new /obj/item/weapon/reagent_containers/pill/dexalin( src )
-		new /obj/item/weapon/reagent_containers/syringe/inaprovaline( src )
+		new /obj/item/weapon/reagent_containers/hypospray/autoinjector( src )
 		new /obj/item/weapon/reagent_containers/syringe/inaprovaline( src )
 		new /obj/item/device/healthanalyzer( src )
 		return
 
+/obj/item/weapon/storage/firstaid/adv
+	name = "advanced first-aid kit"
+	desc = "Contains advanced medical treatments."
+	icon_state = "advfirstaid"
+	item_state = "firstaid-advanced"
+
+/obj/item/weapon/storage/firstaid/adv/New()
+	..()
+	if (empty) return
+	new /obj/item/weapon/reagent_containers/hypospray/autoinjector( src )
+	new /obj/item/stack/medical/advanced/bruise_pack(src)
+	new /obj/item/stack/medical/advanced/bruise_pack(src)
+	new /obj/item/stack/medical/advanced/bruise_pack(src)
+	new /obj/item/stack/medical/advanced/ointment(src)
+	new /obj/item/stack/medical/advanced/ointment(src)
+	new /obj/item/stack/medical/splint(src)
+	return
 /*
  * Pill Bottles
  */
@@ -103,9 +120,10 @@
 	icon = 'icons/obj/chemical.dmi'
 	item_state = "contsolid"
 	w_class = 2.0
-	can_hold = list("/obj/item/weapon/reagent_containers/pill","/obj/item/weapon/dice")
+	can_hold = list("/obj/item/weapon/reagent_containers/pill","/obj/item/weapon/dice","/obj/item/weapon/paper")
 	allow_quick_gather = 1
 	use_to_pickup = 1
+	storage_slots = 14
 
 /obj/item/weapon/storage/pill_bottle/MouseDrop(obj/over_object as obj) //Quick pillbottle fix. -Agouri
 

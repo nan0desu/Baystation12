@@ -1,6 +1,6 @@
 /obj/item/clothing/mask/gas
 	name = "gas mask"
-	desc = "A face-covering mask that can be connected to an air supply."
+	desc = "A face-covering mask that can be connected to an air supply. Filters harmful gases from the air."
 	icon_state = "gas_alt"
 	flags = FPRINT | TABLEPASS | MASKCOVERSMOUTH | MASKCOVERSEYES | BLOCK_GAS_SMOKE_EFFECT | MASKINTERNALS
 	flags_inv = HIDEEARS|HIDEEYES|HIDEFACE
@@ -8,6 +8,8 @@
 	item_state = "gas_alt"
 	gas_transfer_coefficient = 0.01
 	permeability_coefficient = 0.01
+	siemens_coefficient = 0.9
+	var/gas_filter_strength = 1			//For gas mask filters
 
 //Plague Dr suit can be found in clothing/suits/bio.dm
 /obj/item/clothing/mask/gas/plaguedoctor
@@ -21,11 +23,13 @@
 	name = "\improper SWAT mask"
 	desc = "A close-fitting tactical mask that can be connected to an air supply."
 	icon_state = "swat"
+	siemens_coefficient = 0.7
 
 /obj/item/clothing/mask/gas/syndicate
 	name = "syndicate mask"
 	desc = "A close-fitting tactical mask that can be connected to an air supply."
 	icon_state = "swat"
+	siemens_coefficient = 0.7
 
 /obj/item/clothing/mask/gas/voice
 	name = "gas mask"
@@ -41,6 +45,7 @@
 	icon_state = "s-ninja"
 	item_state = "s-ninja_mask"
 	vchange = 1
+	siemens_coefficient = 0.2
 
 /obj/item/clothing/mask/gas/clown_hat
 	name = "clown wig and mask"
@@ -76,6 +81,7 @@
 	name = "Death Commando Mask"
 	icon_state = "death_commando_mask"
 	item_state = "death_commando_mask"
+	siemens_coefficient = 0.2
 
 /obj/item/clothing/mask/gas/cyborg
 	name = "cyborg visor"

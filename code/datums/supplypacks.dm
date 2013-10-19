@@ -66,6 +66,29 @@ var/list/all_supply_groups = list("Operations","Security","Hospitality","Enginee
 	containername = "Monkey crate"
 	group = "Hydroponics"
 
+/datum/supply_packs/farwa
+	name = "Farwa crate"
+	contains = list (/obj/item/weapon/storage/box/monkeycubes/farwacubes)
+	cost = 30
+	containertype = /obj/structure/closet/crate/freezer
+	containername = "Farwa crate"
+	group = "Hydroponics"
+
+/datum/supply_packs/skrell
+	name = "Neaera crate"
+	contains = list (/obj/item/weapon/storage/box/monkeycubes/neaeracubes)
+	cost = 30
+	containertype = /obj/structure/closet/crate/freezer
+	containername = "Neaera crate"
+	group = "Hydroponics"
+
+/datum/supply_packs/stok
+	name = "Stok crate"
+	contains = list (/obj/item/weapon/storage/box/monkeycubes/stokcubes)
+	cost = 30
+	containertype = /obj/structure/closet/crate/freezer
+	containername = "Stok crate"
+	group = "Hydroponics"
 
 /datum/supply_packs/beanbagammo
 	name = "Beanbag shells"
@@ -333,10 +356,12 @@ var/list/all_supply_groups = list("Operations","Security","Hospitality","Enginee
 					/obj/item/weapon/storage/firstaid/fire,
 					/obj/item/weapon/storage/firstaid/toxin,
 					/obj/item/weapon/storage/firstaid/o2,
+					/obj/item/weapon/storage/firstaid/adv,
 					/obj/item/weapon/reagent_containers/glass/bottle/antitoxin,
 					/obj/item/weapon/reagent_containers/glass/bottle/inaprovaline,
 					/obj/item/weapon/reagent_containers/glass/bottle/stoxin,
-					/obj/item/weapon/storage/box/syringes)
+					/obj/item/weapon/storage/box/syringes,
+					/obj/item/weapon/storage/box/autoinjectors)
 	cost = 10
 	containertype = /obj/structure/closet/crate/medical
 	containername = "Medical crate"
@@ -659,6 +684,24 @@ var/list/all_supply_groups = list("Operations","Security","Hospitality","Enginee
 	cost = 50
 	containertype = /obj/structure/closet/crate/secure
 	containername = "Ballistic gear crate"
+	access = access_armory
+	group = "Security"
+
+/datum/supply_packs/shotgunammo
+	name = "Shotgun shells"
+	contains = list(/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun,
+					/obj/item/ammo_casing/shotgun)
+	cost = 20
+	containertype = /obj/structure/closet/crate/secure
+	containername = "Shotgun shells"
 	access = access_armory
 	group = "Security"
 

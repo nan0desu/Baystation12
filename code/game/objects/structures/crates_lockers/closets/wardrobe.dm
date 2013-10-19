@@ -84,6 +84,7 @@
 	new /obj/item/clothing/suit/chaplain_hoodie(src)
 	new /obj/item/clothing/head/chaplain_hood(src)
 	new /obj/item/clothing/suit/holidaypriest(src)
+	new /obj/item/clothing/under/wedding/bride_white(src)
 	new /obj/item/weapon/storage/backpack/cultpack (src)
 	new /obj/item/weapon/storage/fancy/candle_box(src)
 	new /obj/item/weapon/storage/fancy/candle_box(src)
@@ -102,6 +103,19 @@
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
+	return
+
+/obj/structure/closet/wardrobe/xenos
+	name = "xenos wardrobe"
+	icon_state = "green"
+	icon_closed = "green"
+
+/obj/structure/closet/wardrobe/xenos/New()
+	new /obj/item/clothing/suit/unathi/mantle(src)
+	new /obj/item/clothing/suit/unathi/robe(src)
+	new /obj/item/clothing/shoes/sandal(src)
+	new /obj/item/clothing/shoes/sandal(src)
+	new /obj/item/clothing/shoes/sandal(src)
 	return
 
 
@@ -148,6 +162,12 @@
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
+	new /obj/item/clothing/head/hardhat/red(src)
+	new /obj/item/clothing/head/hardhat/red(src)
+	new /obj/item/clothing/head/hardhat/red(src)
+	new /obj/item/clothing/head/beret/eng(src)
+	new /obj/item/clothing/head/beret/eng(src)
+	new /obj/item/clothing/head/beret/eng(src)
 	return
 
 
@@ -164,6 +184,12 @@
 	new /obj/item/clothing/shoes/orange(src)
 	new /obj/item/clothing/shoes/orange(src)
 	new /obj/item/clothing/shoes/orange(src)
+	new /obj/item/clothing/head/hardhat(src)
+	new /obj/item/clothing/head/hardhat(src)
+	new /obj/item/clothing/head/hardhat(src)
+	new /obj/item/clothing/head/beret/eng(src)
+	new /obj/item/clothing/head/beret/eng(src)
+	new /obj/item/clothing/head/beret/eng(src)
 	return
 
 
@@ -289,7 +315,7 @@
 	icon_state = "white"
 	icon_closed = "white"
 
-/obj/structure/closet/wardrobe/virology_white/New()
+/obj/structure/closet/wardrobe/medic_white/New()
 	new /obj/item/clothing/under/rank/medical(src)
 	new /obj/item/clothing/under/rank/medical(src)
 	new /obj/item/clothing/under/rank/medical/blue(src)
@@ -328,13 +354,18 @@
 	icon_closed = "mixed"
 
 /obj/structure/closet/wardrobe/mixed/New()
-	new /obj/item/clothing/under/color/white(src)
 	new /obj/item/clothing/under/color/blue(src)
 	new /obj/item/clothing/under/color/yellow(src)
 	new /obj/item/clothing/under/color/green(src)
 	new /obj/item/clothing/under/color/orange(src)
 	new /obj/item/clothing/under/color/pink(src)
-	new /obj/item/clothing/shoes/black(src)
-	new /obj/item/clothing/shoes/brown(src)
-	new /obj/item/clothing/shoes/white(src)
+	new /obj/item/clothing/under/dress/plaid_blue(src)
+	new /obj/item/clothing/under/dress/plaid_red(src)
+	new /obj/item/clothing/under/dress/plaid_purple(src)
+	new /obj/item/clothing/shoes/blue(src)
+	new /obj/item/clothing/shoes/yellow(src)
+	new /obj/item/clothing/shoes/green(src)
+	new /obj/item/clothing/shoes/orange(src)
+	new /obj/item/clothing/shoes/purple(src)
+	new /obj/item/clothing/shoes/leather(src)
 	return

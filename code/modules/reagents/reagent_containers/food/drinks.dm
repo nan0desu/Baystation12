@@ -45,8 +45,7 @@
 
 			M.attack_log += text("\[[time_stamp()]\] <font color='orange'>Has been fed [src.name] by [user.name] ([user.ckey]) Reagents: [reagentlist(src)]</font>")
 			user.attack_log += text("\[[time_stamp()]\] <font color='red'>Fed [M.name] by [M.name] ([M.ckey]) Reagents: [reagentlist(src)]</font>")
-
-			log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+			log_attack("[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] Reagents: [reagentlist(src)] (INTENT: [uppertext(user.a_intent)]) (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
 
 			if(reagents.total_volume)
 				reagents.reaction(M, INGEST)
@@ -203,7 +202,7 @@
 /obj/item/weapon/reagent_containers/food/drinks/tea
 	name = "Duke Purple Tea"
 	desc = "An insult to Duke Purple is an insult to the Space Queen! Any proper gentleman will fight you, if you sully this tea."
-	icon_state = "tea"
+	icon_state = "teacup"
 	item_state = "coffee"
 	New()
 		..()
@@ -224,7 +223,7 @@
 /obj/item/weapon/reagent_containers/food/drinks/h_chocolate
 	name = "Dutch Hot Coco"
 	desc = "Made in Space South America."
-	icon_state = "tea"
+	icon_state = "hot_coco"
 	item_state = "coffee"
 	New()
 		..()
@@ -382,6 +381,24 @@
 	name = "Captain's Flask"
 	desc = "A metal flask belonging to the captain"
 	icon_state = "flask"
+	volume = 60
+
+/obj/item/weapon/reagent_containers/food/drinks/flask/detflask
+	name = "Detective's Flask"
+	desc = "A metal flask with a leather band and golden badge belonging to the detective."
+	icon_state = "detflask"
+	volume = 60
+
+/obj/item/weapon/reagent_containers/food/drinks/flask/barflask
+	name = "flask"
+	desc = "For those who can't be bothered to hang out at the bar to drink."
+	icon_state = "barflask"
+	volume = 60
+
+/obj/item/weapon/reagent_containers/food/drinks/flask/vacuumflask
+	name = "vacuum flask"
+	desc = "Keeping your drinks at the perfect temperature since 2321."
+	icon_state = "vacuumflask"
 	volume = 60
 
 /obj/item/weapon/reagent_containers/food/drinks/britcup

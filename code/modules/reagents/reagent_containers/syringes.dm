@@ -6,11 +6,12 @@
 #define SYRINGE_BROKEN 2
 
 /obj/item/weapon/reagent_containers/syringe
-	name = "Syringe"
+	name = "syringe"
 	desc = "A syringe."
 	icon = 'icons/obj/syringe.dmi'
 	item_state = "syringe_0"
 	icon_state = "0"
+	g_amt = 150
 	amount_per_transfer_from_this = 5
 	possible_transfer_amounts = null //list(5,10,15)
 	volume = 15
@@ -80,57 +81,20 @@
 					if(istype(target, /mob/living/carbon))//maybe just add a blood reagent to all mobs. Then you can suck them dry...With hundreds of syringes. Jolly good idea.
 						var/amount = src.reagents.maximum_volume - src.reagents.total_volume
 						var/mob/living/carbon/T = target
-						var/datum/reagent/B = new /datum/reagent/blood
 						if(!T.dna)
 							usr << "You are unable to locate any blood. (To be specific, your target seems to be missing their DNA datum)"
 							return
 						if(NOCLONE in T.mutations) //target done been et, no more blood in him
 							user << "\red You are unable to locate any blood."
 							return
-						if(ishuman(T))
-							if(T:vessel.get_reagent_amount("blood") < amount)
-								return
-						B.holder = src
-						B.volume = amount
-						//set reagent data
-						B.data["donor"] = T
-						/*
-						if(T.virus && T.virus.spread_type != SPECIAL)
-							B.data["virus"] = new T.virus.type(0)
-						*/
 
+						var/datum/reagent/B = T.take_blood(src,amount)
 
-
-						for(var/datum/disease/D in T.viruses)
-							if(!B.data["viruses"])
-								B.data["viruses"] = list()
-
-
-							B.data["viruses"] += new D.type(0, D, 1)
-
-						if(T.virus2)
-							B.data["virus2"] = T.virus2.getcopy()
-
-						B.data["blood_DNA"] = copytext(T.dna.unique_enzymes,1,0)
-						if(T.resistances&&T.resistances.len)
-							B.data["resistances"] = T.resistances.Copy()
-						if(istype(target, /mob/living/carbon/human))//I wish there was some hasproperty operation...
-							var/mob/living/carbon/human/HT = target
-							B.data["blood_type"] = copytext(HT.dna.b_type,1,0)
-						var/list/temp_chem = list()
-						for(var/datum/reagent/R in target.reagents.reagent_list)
-							temp_chem += R.name
-							temp_chem[R.name] = R.volume
-						B.data["trace_chem"] = list2params(temp_chem)
-						B.data["antibodies"] = T.antibodies
-
-						if(ishuman(T))
-							T:vessel.remove_reagent("blood",amount) // Removes blood if human
-
-						src.reagents.reagent_list += B
-						src.reagents.update_total()
-						src.on_reagent_change()
-						src.reagents.handle_reactions()
+						if (B)
+							src.reagents.reagent_list += B
+							src.reagents.update_total()
+							src.on_reagent_change()
+							src.reagents.handle_reactions()
 						user << "\blue You take a blood sample from [target]"
 						for(var/mob/O in viewers(4, user))
 							O.show_message("\red [user] takes a blood sample from [target].", 1)
@@ -166,11 +130,33 @@
 					return
 
 				if(ismob(target) && target != user)
+					var/time = 30 //Injecting through a hardsuit takes longer due to needing to find a port.
+					if(istype(target,/mob/living/carbon/human))
+						var/mob/living/carbon/human/H = target
+						if(H.wear_suit && istype(H.wear_suit,/obj/item/clothing/suit/space))
+							time = 60
+
 					for(var/mob/O in viewers(world.view, user))
-						O.show_message(text("\red <B>[] is trying to inject []!</B>", user, target), 1)
-					if(!do_mob(user, target)) return
+						if(time == 30)
+							O.show_message(text("\red <B>[] is trying to inject []!</B>", user, target), 1)
+						else
+							O.show_message(text("\red <B>[] begins hunting for an injection port on []'s suit!</B>", user, target), 1)
+
+					if(!do_mob(user, target, time)) return
+
 					for(var/mob/O in viewers(world.view, user))
 						O.show_message(text("\red [] injects [] with the syringe!", user, target), 1)
+
+					if(istype(target,/mob/living))
+						var/mob/living/M = target
+						var/list/injected = list()
+						for(var/datum/reagent/R in src.reagents.reagent_list)
+							injected += R.name
+						var/contained = english_list(injected)
+						M.attack_log += text("\[[time_stamp()]\] <font color='orange'>Has been injected with [src.name] by [user.name] ([user.ckey]). Reagents: [contained]</font>")
+						user.attack_log += text("\[[time_stamp()]\] <font color='red'>Used the [src.name] to inject [M.name] ([M.key]). Reagents: [contained]</font>")
+						msg_admin_attack("[user.name] ([user.ckey]) injected [M.name] ([M.key]) with [src.name]. Reagents: [contained] (INTENT: [uppertext(user.a_intent)]) (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
+
 					src.reagents.reaction(target, INGEST)
 				if(ismob(target) && target == user)
 					src.reagents.reaction(target, INGEST)
@@ -180,11 +166,9 @@
 						B = d
 						break
 					var/trans
-					if(B && ishuman(target))
-						var/mob/living/carbon/human/H = target
-						trans = B.volume > 5? 5 : B.volume
-						H.vessel.add_reagent("blood",trans,B.data)
-						src.reagents.remove_reagent("blood",trans)
+					if(B && istype(target,/mob/living/carbon))
+						var/mob/living/carbon/C = target
+						C.inject_blood(src,5)
 					else
 						trans = src.reagents.trans_to(target, amount_per_transfer_from_this)
 					user << "\blue You inject [trans] units of the solution. The syringe now contains [src.reagents.total_volume] units."
@@ -197,7 +181,7 @@
 	update_icon()
 		if(mode == SYRINGE_BROKEN)
 			icon_state = "broken"
-			overlays = null //dirty fix
+			overlays.Cut()
 			return
 		var/rounded_vol = round(reagents.total_volume,5)
 		overlays.Cut()
@@ -225,8 +209,7 @@
 
 		user.attack_log += "\[[time_stamp()]\]<font color='red'> Attacked [target.name] ([target.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>"
 		target.attack_log += "\[[time_stamp()]\]<font color='orange'> Attacked by [user.name] ([user.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>"
-
-		log_attack("<font color='red'> [user.name] ([user.ckey]) attacked [target.name] ([target.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+		msg_admin_attack("[user.name] ([user.ckey]) attacked [target.name] ([target.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)]) (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
 
 		if(istype(target, /mob/living/carbon/human))
 
@@ -246,15 +229,15 @@
 
 			if (target != user && target.getarmor(target_zone, "melee") > 5 && prob(50))
 				for(var/mob/O in viewers(world.view, user))
-					O.show_message(text("\red <B>[user] tries to stab [target] in the [hit_area] with [src.name], but the attack is deflected by armor!</B>"), 1)
+					O.show_message(text("\red <B>[user] tries to stab [target] in \the [hit_area] with [src.name], but the attack is deflected by armor!</B>"), 1)
 				user.u_equip(src)
 				del(src)
 				return
 
 			for(var/mob/O in viewers(world.view, user))
-				O.show_message(text("\red <B>[user] stabs [target] in the [hit_area] with [src.name]!</B>"), 1)
+				O.show_message(text("\red <B>[user] stabs [target] in \the [hit_area] with [src.name]!</B>"), 1)
 
-			if(affecting.take_damage(7))
+			if(affecting.take_damage(3))
 				target:UpdateDamageIcon()
 
 		else

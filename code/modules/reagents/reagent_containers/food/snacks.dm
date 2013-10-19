@@ -11,10 +11,12 @@
 	var/slices_num
 
 	//Placeholder for effect that trigger on eating that aren't tied to reagents.
-/obj/item/weapon/reagent_containers/food/snacks/proc/On_Consume()
+/obj/item/weapon/reagent_containers/food/snacks/proc/On_Consume(var/mob/M)
 	if(!usr)	return
 	if(!reagents.total_volume)
-		usr.visible_message("<span class='notice'>[usr] finishes eating [src].</span>","<span class='notice'>You finish eating [src].</span>")
+		if(M == usr)
+			usr << "<span class='notice'>You finish eating \the [src].</span>"
+		usr.visible_message("<span class='notice'>[usr] finishes eating \the [src].</span>")
 		usr.drop_from_inventory(src)	//so icons update :[
 
 		if(trash)
@@ -64,8 +66,7 @@
 
 				M.attack_log += text("\[[time_stamp()]\] <font color='orange'>Has been fed [src.name] by [user.name] ([user.ckey]) Reagents: [reagentlist(src)]</font>")
 				user.attack_log += text("\[[time_stamp()]\] <font color='red'>Fed [src.name] by [M.name] ([M.ckey]) Reagents: [reagentlist(src)]</font>")
-
-				log_attack("<font color='red'>[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] (INTENT: [uppertext(user.a_intent)])</font>")
+				log_attack("[user.name] ([user.ckey]) fed [M.name] ([M.ckey]) with [src.name] Reagents: [reagentlist(src)] (INTENT: [uppertext(user.a_intent)])")
 
 				for(var/mob/O in viewers(world.view, user))
 					O.show_message("\red [user] feeds [M] [src].", 1)
@@ -90,7 +91,7 @@
 					else
 						reagents.trans_to(M, reagents.total_volume)
 					bitecount++
-					On_Consume()
+					On_Consume(M)
 			return 1
 
 	return 0
@@ -459,41 +460,41 @@
 
 			usr << "\blue You color \the [src] [clr]"
 			icon_state = "egg-[clr]"
-			color = clr
+			item_color = clr
 		else
 			..()
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/blue
 	icon_state = "egg-blue"
-	color = "blue"
+	item_color = "blue"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/green
 	icon_state = "egg-green"
-	color = "green"
+	item_color = "green"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/mime
 	icon_state = "egg-mime"
-	color = "mime"
+	item_color = "mime"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/orange
 	icon_state = "egg-orange"
-	color = "orange"
+	item_color = "orange"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/purple
 	icon_state = "egg-purple"
-	color = "purple"
+	item_color = "purple"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/rainbow
 	icon_state = "egg-rainbow"
-	color = "rainbow"
+	item_color = "rainbow"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/red
 	icon_state = "egg-red"
-	color = "red"
+	item_color = "red"
 
 /obj/item/weapon/reagent_containers/food/snacks/egg/yellow
 	icon_state = "egg-yellow"
-	color = "yellow"
+	item_color = "yellow"
 
 /obj/item/weapon/reagent_containers/food/snacks/friedegg
 	name = "Fried egg"
@@ -1331,6 +1332,7 @@
 	icon_state = "monkeycube"
 	bitesize = 12
 	var/wrapped = 0
+	var/monkey_type = null
 
 	New()
 		..()
@@ -1338,7 +1340,7 @@
 
 	afterattack(obj/O as obj, mob/user as mob)
 		if(istype(O,/obj/structure/sink) && !wrapped)
-			user << "You place [name] under a stream of water..."
+			user << "You place \the [name] under a stream of water..."
 			loc = get_turf(O)
 			return Expand()
 		..()
@@ -1349,8 +1351,17 @@
 
 	proc/Expand()
 		for(var/mob/M in viewers(src,7))
-			M << "\red The monkey cube expands!"
-		new /mob/living/carbon/monkey(get_turf(src))
+			M << "\red \The [src] expands!"
+		if(monkey_type)
+			switch(monkey_type)
+				if("tajara")
+					new /mob/living/carbon/monkey/tajara(get_turf(src))
+				if("unathi")
+					new /mob/living/carbon/monkey/unathi(get_turf(src))
+				if("skrell")
+					new /mob/living/carbon/monkey/skrell(get_turf(src))
+		else
+			new /mob/living/carbon/monkey(get_turf(src))
 		del(src)
 
 	proc/Unwrap(mob/user as mob)
@@ -1364,6 +1375,30 @@
 	desc = "Still wrapped in some paper."
 	icon_state = "monkeycubewrap"
 	wrapped = 1
+
+
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/farwacube
+	name = "farwa cube"
+	monkey_type ="tajara"
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/farwacube
+	name = "farwa cube"
+	monkey_type ="tajara"
+
+
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/stokcube
+	name = "stok cube"
+	monkey_type ="unathi"
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/stokcube
+	name = "stok cube"
+	monkey_type ="unathi"
+
+
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/neaeracube
+	name = "neaera cube"
+	monkey_type ="skrell"
+/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/neaeracube
+	name = "neaera cube"
+	monkey_type ="skrell"
 
 
 /obj/item/weapon/reagent_containers/food/snacks/spellburger
@@ -1562,6 +1597,26 @@
 	New()
 		..()
 		reagents.add_reagent("nutriment", 2)
+		bitesize = 2
+
+/obj/item/weapon/reagent_containers/food/snacks/boiledrice
+	name = "Boiled Rice"
+	desc = "A boring dish of boring rice."
+	icon_state = "boiledrice"
+	trash = /obj/item/trash/snack_bowl
+	New()
+		..()
+		reagents.add_reagent("nutriment", 2)
+		bitesize = 2
+
+/obj/item/weapon/reagent_containers/food/snacks/ricepudding
+	name = "Rice Pudding"
+	desc = "Where's the Jam!"
+	icon_state = "rpudding"
+	trash = /obj/item/trash/snack_bowl
+	New()
+		..()
+		reagents.add_reagent("nutriment", 4)
 		bitesize = 2
 
 /obj/item/weapon/reagent_containers/food/snacks/pastatomato

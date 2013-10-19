@@ -86,6 +86,9 @@ proc/move_mining_shuttle()
 		for(var/mob/living/carbon/bug in toArea) // If someone somehow is still in the shuttle's docking area...
 			bug.gib()
 
+		for(var/mob/living/simple_animal/pest in toArea) // And for the other kind of bug...
+			pest.gib()
+
 		fromArea.move_contents_to(toArea)
 		if (mining_shuttle_location)
 			mining_shuttle_location = 0
@@ -129,10 +132,10 @@ proc/move_mining_shuttle()
 	usr.set_machine(src)
 	src.add_fingerprint(usr)
 	if(href_list["move"])
-		if(ticker.mode.name == "blob")
-			if(ticker.mode:declared)
-				usr << "Under directive 7-10, [station_name()] is quarantined until further notice."
-				return
+		//if(ticker.mode.name == "blob")
+		//	if(ticker.mode:declared)
+		//		usr << "Under directive 7-10, [station_name()] is quarantined until further notice."
+		//		return
 
 		if (!mining_shuttle_moving)
 			usr << "\blue Shuttle recieved message and will be sent shortly."
@@ -193,6 +196,10 @@ proc/move_mining_shuttle()
 	var/digspeed = 40 //moving the delay to an item var so R&D can make improved picks. --NEO
 	origin_tech = "materials=1;engineering=1"
 	attack_verb = list("hit", "pierced", "sliced", "attacked")
+	var/drill_sound = 'sound/weapons/Genhit.ogg'
+	var/drill_verb = "picking"
+
+	var/excavation_amount = 100
 
 	hammer
 		name = "sledgehammer"

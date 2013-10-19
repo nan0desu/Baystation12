@@ -3,7 +3,7 @@
 /obj/machinery/door/firedoor
 	name = "\improper Emergency Shutter"
 	desc = "Emergency air-tight shutter, capable of sealing off breached areas."
-	icon = 'DoorHazard.dmi'
+	icon = 'icons/obj/doors/DoorHazard.dmi'
 	icon_state = "door_open"
 	req_one_access = list(access_atmospherics, access_engine_equip)
 	opacity = 0
@@ -17,6 +17,11 @@
 
 	New()
 		. = ..()
+		for(var/obj/machinery/door/firedoor/F in loc)
+			if(F != src)
+				spawn(1)
+					del src
+				return .
 		var/area/A = get_area(src)
 		ASSERT(istype(A))
 
@@ -52,12 +57,20 @@
 			return
 		if(!density)
 			return ..()
+		if(istype(AM, /obj/mecha))
+			var/obj/mecha/mecha = AM
+			if (mecha.occupant)
+				var/mob/M = mecha.occupant
+				if(world.time - M.last_bumped <= 10) return //Can bump-open one airlock per second. This is to prevent popup message spam.
+				M.last_bumped = world.time
+				attack_hand(M)
 		return 0
 
 
 	power_change()
 		if(powered(ENVIRON))
 			stat &= ~NOPOWER
+			latetoggle()
 		else
 			stat |= NOPOWER
 		return
@@ -134,7 +147,7 @@
 			else
 				users_name = "Unknown"
 
-		if( !stat && ( istype(C, /obj/item/weapon/card/id) || istype(C, /obj/item/device/pda) ) )
+		if( ishuman(user) &&  !stat && ( istype(C, /obj/item/weapon/card/id) || istype(C, /obj/item/device/pda) ) )
 			var/obj/item/weapon/card/id/ID = C
 
 			if( istype(C, /obj/item/device/pda) )
@@ -185,21 +198,29 @@
 					nextstate = CLOSED
 
 
-	process()
+	proc/latetoggle()
 		if(operating || stat & NOPOWER || !nextstate)
 			return
 		switch(nextstate)
 			if(OPEN)
-				spawn()
-					open()
+				nextstate = null
+				open()
 			if(CLOSED)
-				spawn()
-					close()
-		nextstate = null
+				nextstate = null
+				close()
 		return
 
+	open()
+		..()
+		latetoggle()
+		return
 
-	animate(animation)
+	close()
+		..()
+		latetoggle()
+		return
+
+	do_animate(animation)
 		switch(animation)
 			if("opening")
 				flick("door_opening", src)
@@ -223,10 +244,13 @@
 
 
 /obj/machinery/door/firedoor/border_only
+//These are playing merry hell on ZAS.  Sorry fellas :(
+/*
 	icon = 'icons/obj/doors/edge_Doorfire.dmi'
 	glass = 1 //There is a glass window so you can see through the door
 			  //This is needed due to BYOND limitations in controlling visibility
 	heat_proof = 1
+	air_properties_vary_with_direction = 1
 
 	CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 		if(istype(mover) && mover.checkpass(PASSGLASS))
@@ -257,3 +281,8 @@
 		if(istype(source)) air_master.tiles_to_update += source
 		if(istype(destination)) air_master.tiles_to_update += destination
 		return 1
+*/
+
+/obj/machinery/door/firedoor/multi_tile
+	icon = 'icons/obj/doors/DoorHazard2x1.dmi'
+	width = 2

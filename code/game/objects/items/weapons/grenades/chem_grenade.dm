@@ -36,9 +36,7 @@
 		if(stage > 1 && !active && clown_check(user))
 			user << "<span class='warning'>You prime \the [name]!</span>"
 
-			log_attack("<font color='red'>[user.name] ([user.ckey]) primed \a [src].</font>")
-			log_admin("ATTACK: [user] ([user.ckey]) primed \a [src].")
-			message_admins("ATTACK: [user] ([user.ckey]) primed \a [src].")
+			msg_admin_attack("[user.name] ([user.ckey]) primed \a [src]. (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
 
 			activate()
 			add_fingerprint(user)
@@ -114,7 +112,7 @@
 
 	activate(mob/user as mob)
 		if(active) return
-	
+
 		if(detonator)
 			if(!isigniter(detonator.a_left))
 				detonator.a_left.activate()
@@ -126,9 +124,7 @@
 			icon_state = initial(icon_state) + "_active"
 
 			if(user)
-				log_attack("<font color='red'>[user.name] ([user.ckey]) primed \a [src]</font>")
-				log_admin("ATTACK: [user] ([user.ckey]) primed \a [src]")
-				message_admins("ATTACK: [user] ([user.ckey]) primed \a [src]")
+				msg_admin_attack("[user.name] ([user.ckey]) primed \a [src] (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[user.x];Y=[user.y];Z=[user.z]'>JMP</a>)")
 
 		return
 
@@ -216,9 +212,11 @@
 		var/obj/item/weapon/reagent_containers/glass/beaker/B1 = new(src)
 		var/obj/item/weapon/reagent_containers/glass/beaker/B2 = new(src)
 
-		B1.reagents.add_reagent("aluminum", 25)
-		B2.reagents.add_reagent("plasma", 25)
-		B2.reagents.add_reagent("sacid", 25)
+		B1.reagents.add_reagent("aluminum", 15)
+		B1.reagents.add_reagent("fuel",20)
+		B2.reagents.add_reagent("plasma", 15)
+		B2.reagents.add_reagent("sacid", 15)
+		B1.reagents.add_reagent("fuel",20)
 
 		detonator = new/obj/item/device/assembly_holder/timer_igniter(src)
 
@@ -247,7 +245,7 @@
 		icon_state = "grenade"
 
 /obj/item/weapon/grenade/chem_grenade/cleaner
-	name = "Cleaner Grenade"
+	name = "cleaner grenade"
 	desc = "BLAM!-brand foaming space cleaner. In a special applicator for rapid cleaning of wide areas."
 	stage = 2
 	path = 1

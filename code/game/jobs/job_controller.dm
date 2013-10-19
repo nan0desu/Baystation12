@@ -1,5 +1,9 @@
 var/global/datum/controller/occupations/job_master
 
+#define GET_RANDOM_JOB 0
+#define BE_ASSISTANT 1
+#define RETURN_TO_LOBBY 2
+
 /datum/controller/occupations
 		//List of all jobs
 	var/list/occupations = list()
@@ -130,7 +134,40 @@ var/global/datum/controller/occupations/job_master
 				if(!job)	continue
 				var/list/candidates = FindOccupationCandidates(job, level)
 				if(!candidates.len)	continue
-				var/mob/new_player/candidate = pick(candidates)
+
+				// Build a weighted list, weight by age.
+				var/list/weightedCandidates = list()
+
+				// Different head positions have different good ages.
+				var/good_age_minimal = 25
+				var/good_age_maximal = 60
+				if(command_position == "Captain")
+					good_age_minimal = 30
+					good_age_maximal = 70 // Old geezer captains ftw
+
+				for(var/mob/V in candidates)
+					// Log-out during round-start? What a bad boy, no head position for you!
+					if(!V.client) continue
+					var/age = V.client.prefs.age
+					switch(age)
+						if(good_age_minimal - 10 to good_age_minimal)
+							weightedCandidates[V] = 3 // Still a bit young.
+						if(good_age_minimal to good_age_minimal + 10)
+							weightedCandidates[V] = 6 // Better.
+						if(good_age_minimal + 10 to good_age_maximal - 10)
+							weightedCandidates[V] = 10 // Great.
+						if(good_age_maximal - 10 to good_age_maximal)
+							weightedCandidates[V] = 6 // Still good.
+						if(good_age_maximal to good_age_maximal + 10)
+							weightedCandidates[V] = 6 // Bit old, don't you think?
+						if(good_age_maximal to good_age_maximal + 50)
+							weightedCandidates[V] = 3 // Geezer.
+						else
+							// If there's ABSOLUTELY NOBODY ELSE
+							if(candidates.len == 1) weightedCandidates[V] = 1
+
+
+				var/mob/new_player/candidate = pickweight(weightedCandidates)
 				if(AssignRole(candidate, command_position))
 					return 1
 		return 0
@@ -270,9 +307,8 @@ var/global/datum/controller/occupations/job_master
 		// Hand out random jobs to the people who didn't get any in the last check
 		// Also makes sure that they got their preference correct
 		for(var/mob/new_player/player in unassigned)
-			if(player.client.prefs.userandomjob)
+			if(player.client.prefs.alternate_option == GET_RANDOM_JOB)
 				GiveRandomJob(player)
-
 		/*
 		Old job system
 		for(var/level = 1 to 3)
@@ -297,8 +333,15 @@ var/global/datum/controller/occupations/job_master
 
 		// For those who wanted to be assistant if their preferences were filled, here you go.
 		for(var/mob/new_player/player in unassigned)
-			Debug("AC2 Assistant located, Player: [player]")
-			AssignRole(player, "Assistant")
+			if(player.client.prefs.alternate_option == BE_ASSISTANT)
+				Debug("AC2 Assistant located, Player: [player]")
+				AssignRole(player, "Assistant")
+
+		//For ones returning to lobby
+		for(var/mob/new_player/player in unassigned)
+			if(player.client.prefs.alternate_option == RETURN_TO_LOBBY)
+				player.ready = 0
+				unassigned -= player
 		return 1
 
 
@@ -326,7 +369,7 @@ var/global/datum/controller/occupations/job_master
 
 		//give them an account in the station database
 		if(centcomm_account_db)
-			var/datum/money_account/M = centcomm_account_db.add_account_across_all(H.real_name, starting_funds = rand(50,500)*10, pre_existing = 1)
+			var/datum/money_account/M = create_account(H.real_name, rand(50,500)*10, null)
 			if(H.mind)
 				var/remembered_info = ""
 				remembered_info += "<b>Your account number is:</b> #[M.account_number]<br>"
@@ -371,15 +414,15 @@ var/global/datum/controller/occupations/job_master
 							H.equip_to_slot_or_del(new /obj/item/weapon/storage/box/survival(H), slot_r_hand)
 						if(2)
 							var/obj/item/weapon/storage/backpack/BPK = new/obj/item/weapon/storage/backpack(H)
-							new /obj/item/weapon/storage/box(BPK)
+							new /obj/item/weapon/storage/box/survival(BPK)
 							H.equip_to_slot_or_del(BPK, slot_back,1)
 						if(3)
 							var/obj/item/weapon/storage/backpack/BPK = new/obj/item/weapon/storage/backpack/satchel_norm(H)
-							new /obj/item/weapon/storage/box(BPK)
+							new /obj/item/weapon/storage/box/survival(BPK)
 							H.equip_to_slot_or_del(BPK, slot_back,1)
 						if(4)
 							var/obj/item/weapon/storage/backpack/BPK = new/obj/item/weapon/storage/backpack/satchel(H)
-							new /obj/item/weapon/storage/box(BPK)
+							new /obj/item/weapon/storage/box/survival(BPK)
 							H.equip_to_slot_or_del(BPK, slot_back,1)
 
 		H << "<B>You are the [alt_title ? alt_title : rank].</B>"
@@ -388,7 +431,14 @@ var/global/datum/controller/occupations/job_master
 			H << "<b>You are playing a job that is important for Game Progression. If you have to disconnect, please notify the admins via adminhelp.</b>"
 
 		spawnId(H, rank, alt_title)
-		H.equip_to_slot_or_del(new /obj/item/device/radio/headset(H), slot_ears)
+		H.equip_to_slot_or_del(new /obj/item/device/radio/headset(H), slot_l_ear)
+
+		//Gives glasses to the vision impaired
+		if(H.disabilities & NEARSIGHTED)
+			var/equipped = H.equip_to_slot_or_del(new /obj/item/clothing/glasses/regular(H), slot_glasses)
+			if(equipped != 1)
+				var/obj/item/clothing/glasses/G = H.glasses
+				G.prescription = 1
 //		H.update_icons()
 		return 1
 

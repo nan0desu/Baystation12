@@ -42,6 +42,9 @@
 		//Disabilities
 		handle_disabilities()
 
+		//Virus updates, duh
+		handle_virus_updates()
+
 	//Apparently, the person who wrote this code designed it so that
 	//blinded get reset each cycle and then get activated later in the
 	//code. Very ugly. I dont care. Moving this stuff here so its easy
@@ -114,6 +117,17 @@
 			emote("collapse")
 
 		if (radiation)
+
+			if(istype(src,/mob/living/carbon/monkey/diona)) //Filthy check. Dionaea don't take rad damage.
+				var/rads = radiation/25
+				radiation -= rads
+				nutrition += rads
+				heal_overall_damage(rads,rads)
+				adjustOxyLoss(-(rads))
+				adjustToxLoss(-(rads))
+				updatehealth()
+				return
+
 			if (radiation > 100)
 				radiation = 100
 				Weaken(10)
@@ -147,6 +161,40 @@
 						emote("gasp")
 					updatehealth()
 
+	proc/handle_virus_updates()
+		if(status_flags & GODMODE)	return 0	//godmode
+		if(bodytemperature > 406)
+			for(var/datum/disease/D in viruses)
+				D.cure()
+			for (var/ID in virus2)
+				var/datum/disease2/disease/V = virus2[ID]
+				V.cure(src)
+
+		for(var/obj/effect/decal/cleanable/blood/B in view(1,src))
+			if(B.virus2.len && get_infection_chance(src))
+				for (var/ID in B.virus2)
+					var/datum/disease2/disease/V = virus2[ID]
+					infect_virus2(src,V)
+		for(var/obj/effect/decal/cleanable/mucus/M in view(1,src))
+			if(M.virus2.len && get_infection_chance(src))
+				for (var/ID in M.virus2)
+					var/datum/disease2/disease/V = virus2[ID]
+					infect_virus2(src,V)
+
+		for (var/ID in virus2)
+			var/datum/disease2/disease/V = virus2[ID]
+			if(isnull(V)) // Trying to figure out a runtime error that keeps repeating
+				CRASH("virus2 nulled before calling activate()")
+			else
+				V.activate(src)
+			// activate may have deleted the virus
+			if(!V) continue
+
+			// check if we're immune
+			if(V.antigen & src.antibodies)
+				V.dead = 1
+
+		return
 
 	proc/breathe()
 		if(reagents)
@@ -179,6 +227,22 @@
 					var/breath_moles = environment.total_moles()*BREATH_PERCENTAGE
 					breath = loc.remove_air(breath_moles)
 
+					if(istype(wear_mask, /obj/item/clothing/mask/gas))
+						var/obj/item/clothing/mask/gas/G = wear_mask
+						var/datum/gas_mixture/filtered = new
+
+						filtered.copy_from(breath)
+						filtered.toxins *= G.gas_filter_strength
+						for(var/datum/gas/gas in filtered.trace_gases)
+							gas.moles *= G.gas_filter_strength
+						filtered.update_values()
+						loc.assume_air(filtered)
+
+						breath.toxins *= 1 - G.gas_filter_strength
+						for(var/datum/gas/gas in breath.trace_gases)
+							gas.moles *= 1 - G.gas_filter_strength
+						breath.update_values()
+
 					// Handle chem smoke effect  -- Doohl
 					var/block = 0
 					if(wear_mask)
@@ -186,7 +250,6 @@
 							block = 1
 
 					if(!block)
-
 						for(var/obj/effect/effect/chem_smoke/smoke in view(1, src))
 							if(smoke.reagents.total_volume)
 								smoke.reagents.reaction(src, INGEST)
@@ -371,6 +434,25 @@
 
 	proc/handle_chemicals_in_body()
 
+		if(istype(src,/mob/living/carbon/monkey/diona)) //Filthy check. Dionaea nymphs need light or they get sad.
+			var/light_amount = 0 //how much light there is in the place, affects receiving nutrition and healing
+			if(isturf(loc)) //else, there's considered to be no light
+				var/turf/T = loc
+				var/area/A = T.loc
+				if(A)
+					if(A.lighting_use_dynamic)	light_amount = min(10,T.lighting_lumcount) - 5 //hardcapped so it's not abused by having a ton of flashlights
+					else						light_amount =  5
+
+			nutrition += light_amount
+			traumatic_shock -= light_amount
+
+			if(nutrition > 500)
+				nutrition = 500
+			if(light_amount > 2) //if there's enough light, heal
+				heal_overall_damage(1,1)
+				adjustToxLoss(-1)
+				adjustOxyLoss(-1)
+
 		if(reagents) reagents.metabolize(src)
 
 		if (drowsyness)
@@ -413,21 +495,36 @@
 				if(!reagents.has_reagent("inaprovaline"))
 					adjustOxyLoss(1)
 				Paralyse(3)
+			if(halloss > 100)
+				src << "<span class='notice'>You're in too much pain to keep going...</span>"
+				for(var/mob/O in oviewers(src, null))
+					O.show_message("<B>[src]</B> slumps to the ground, too weak to continue fighting.", 1)
+				Paralyse(10)
+				setHalLoss(99)
 
 			if(paralysis)
 				AdjustParalysis(-1)
 				blinded = 1
 				stat = UNCONSCIOUS
+				if(halloss > 0)
+					adjustHalLoss(-3)
 			else if(sleeping)
+				handle_dreams()
+				adjustHalLoss(-3)
 				sleeping = max(sleeping-1, 0)
 				blinded = 1
 				stat = UNCONSCIOUS
-				if( prob(10) && health )
+				if( prob(10) && health && !hal_crit )
 					spawn(0)
 						emote("snore")
+			else if(resting)
+				if(halloss > 0)
+					adjustHalLoss(-3)
 			//CONSCIOUS
 			else
 				stat = CONSCIOUS
+				if(halloss > 0)
+					adjustHalLoss(-1)
 
 			//Eyes
 			if(sdisabilities & BLIND)	//disabled-blind, doesn't get better on its own

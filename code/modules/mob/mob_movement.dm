@@ -166,10 +166,12 @@
 
 
 /client/Center()
+	/* No 3D movement in 2D spessman game. dir 16 is Z Up
 	if (isobj(mob.loc))
 		var/obj/O = mob.loc
 		if (mob.canmove)
 			return O.relaymove(mob, 16)
+	*/
 	return
 
 
@@ -256,7 +258,6 @@
 
 	if(!mob.canmove)	return
 
-
 	//if(istype(mob.loc, /turf/space) || (mob.flags & NOGRAV))
 	//	if(!mob.Process_Spacemove(0))	return 0
 
@@ -278,6 +279,10 @@
 				if(M.pulling == mob && !M.restrained() && M.stat == 0 && M.canmove)
 					src << "\blue You're restrained! You can't move!"
 					return 0
+
+		if(mob.pinned.len)
+			src << "\blue You're pinned to a wall by [mob.pinned[1]]!"
+			return 0
 
 		move_delay = world.time//set move delay
 		mob.last_move_intent = world.time + 10

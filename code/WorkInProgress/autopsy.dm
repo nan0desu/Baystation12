@@ -76,9 +76,10 @@
 			chemtraces += V
 
 /obj/item/weapon/autopsy_scanner/verb/print_data()
+	set category = "Object"
 	set src in view(usr, 1)
 	set name = "Print Data"
-	if(usr.stat)
+	if(usr.stat || !(istype(usr,/mob/living/carbon/human)))
 		usr << "No."
 		return
 

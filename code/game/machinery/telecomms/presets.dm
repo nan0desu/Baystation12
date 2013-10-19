@@ -24,12 +24,22 @@
 	toggled = 0
 	autolinkers = list("r_relay")
 
+/obj/machinery/telecomms/relay/preset/centcom
+	id = "Centcom Relay"
+	hide = 1
+	toggled = 1
+	//anchored = 1
+	//use_power = 0
+	//idle_power_usage = 0
+	heatgen = 0
+	autolinkers = list("c_relay")
+
 //HUB
 
 /obj/machinery/telecomms/hub/preset
 	id = "Hub"
 	network = "tcommsat"
-	autolinkers = list("hub", "relay", "s_relay", "m_relay", "r_relay", "science", "medical",
+	autolinkers = list("hub", "relay", "c_relay", "s_relay", "m_relay", "r_relay", "science", "medical",
 	"supply", "common", "command", "engineering", "security",
 	"receiverA", "receiverB", "broadcasterA", "broadcasterB")
 
@@ -132,12 +142,7 @@
 	id = "Supply Server"
 	freq_listening = list(1347)
 	autolinkers = list("supply")
-/*
-/obj/machinery/telecomms/server/presets/mining
-	id = "Mining Server"
-	freq_listening = list(1349)
-	autolinkers = list("mining")
-*/
+
 /obj/machinery/telecomms/server/presets/common
 	id = "Common Server"
 	freq_listening = list()

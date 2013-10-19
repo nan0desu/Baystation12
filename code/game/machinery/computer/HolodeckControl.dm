@@ -32,6 +32,12 @@
 		dat += "<A href='?src=\ref[src];basketball=1'>((Basketball Court)</font>)</A><BR>"
 		dat += "<A href='?src=\ref[src];thunderdomecourt=1'>((Thunderdome Court)</font>)</A><BR>"
 		dat += "<A href='?src=\ref[src];beach=1'>((Beach)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];desert=1'>((Desert)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];space=1'>((Space)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];picnicarea=1'>((Picnic Area)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];snowfield=1'>((Snow Field)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];theatre=1'>((Theatre)</font>)</A><BR>"
+		dat += "<A href='?src=\ref[src];meetinghall=1'>((Meeting Hall)</font>)</A><BR>"
 //		dat += "<A href='?src=\ref[src];turnoff=1'>((Shutdown System)</font>)</A><BR>"
 
 		dat += "Please ensure that only holographic weapons are used in the holodeck if a combat simulation has been loaded.<BR>"
@@ -87,6 +93,36 @@
 
 			else if(href_list["beach"])
 				target = locate(/area/holodeck/source_beach)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["desert"])
+				target = locate(/area/holodeck/source_desert)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["space"])
+				target = locate(/area/holodeck/source_space)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["picnicarea"])
+				target = locate(/area/holodeck/source_picnicarea)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["snowfield"])
+				target = locate(/area/holodeck/source_snowfield)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["theatre"])
+				target = locate(/area/holodeck/source_theatre)
+				if(target)
+					loadProgram(target)
+
+			else if(href_list["meetinghall"])
+				target = locate(/area/holodeck/source_meetinghall)
 				if(target)
 					loadProgram(target)
 
@@ -195,8 +231,10 @@
 	emergencyShutdown()
 	..()
 
-
 /obj/machinery/computer/HolodeckControl/process()
+	for(var/item in holographic_items) // do this first, to make sure people don't take items out when power is down.
+		if(!(get_turf(item) in linkedholodeck))
+			derez(item, 0)
 
 	if(!..())
 		return
@@ -219,13 +257,6 @@
 					s.start()
 				T.ex_act(3)
 				T.hotspot_expose(1000,500,1)
-
-
-		for(var/item in holographic_items)
-			if(!(get_turf(item) in linkedholodeck))
-				derez(item, 0)
-
-
 
 /obj/machinery/computer/HolodeckControl/proc/derez(var/obj/obj , var/silent = 1)
 	holographic_items.Remove(obj)
@@ -417,6 +448,11 @@
 	if(isrobot(user))
 		return
 
+/obj/structure/table/holotable/wood
+	name = "table"
+	desc = "A square piece of wood standing on four wooden legs. It can not move."
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "wood_table"
 
 
 /obj/item/clothing/gloves/boxing/hologlove
@@ -456,11 +492,11 @@
 
 /obj/item/weapon/holo/esword/green
 	New()
-		color = "green"
+		item_color = "green"
 
 /obj/item/weapon/holo/esword/red
 	New()
-		color = "red"
+		item_color = "red"
 
 /obj/item/weapon/holo/esword/IsShield()
 	if(active)
@@ -471,13 +507,13 @@
 	..()
 
 /obj/item/weapon/holo/esword/New()
-	color = pick("red","blue","green","purple")
+	item_color = pick("red","blue","green","purple")
 
 /obj/item/weapon/holo/esword/attack_self(mob/living/user as mob)
 	active = !active
 	if (active)
 		force = 30
-		icon_state = "sword[color]"
+		icon_state = "sword[item_color]"
 		w_class = 4
 		playsound(user, 'sound/weapons/saberon.ogg', 50, 1)
 		user << "\blue [src] is now active."

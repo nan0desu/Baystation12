@@ -34,6 +34,7 @@
 	icon_state = "bodybag_closed"
 	icon_closed = "bodybag_closed"
 	icon_opened = "bodybag_open"
+	var/item_path = /obj/item/bodybag
 	density = 0
 
 
@@ -74,7 +75,7 @@
 			if(opened)	return 0
 			if(contents.len)	return 0
 			visible_message("[usr] folds up the [src.name]")
-			new/obj/item/bodybag(get_turf(src))
+			new item_path(get_turf(src))
 			spawn(0)
 				del(src)
 			return
@@ -84,3 +85,40 @@
 		icon_state = icon_closed
 	else
 		icon_state = icon_opened
+
+
+/obj/item/bodybag/cryobag
+	name = "stasis bag"
+	desc = "A folded, non-reusable bag designed to prevent additional damage to an occupant at the cost of genetic damage."
+	icon = 'icons/obj/cryobag.dmi'
+	icon_state = "bodybag_folded"
+
+	attack_self(mob/user)
+		var/obj/structure/closet/body_bag/cryobag/R = new /obj/structure/closet/body_bag/cryobag(user.loc)
+		R.add_fingerprint(user)
+		del(src)
+
+
+
+/obj/structure/closet/body_bag/cryobag
+	name = "stasis bag"
+	desc = "A non-reusable plastic bag designed to prevent additional damage to an occupant at the cost of genetic damage."
+	icon = 'icons/obj/cryobag.dmi'
+	item_path = /obj/item/bodybag/cryobag
+	var/used = 0
+
+	open()
+		. = ..()
+		if(used)
+			var/obj/item/O = new/obj/item(src.loc)
+			O.name = "used stasis bag"
+			O.icon = src.icon
+			O.icon_state = "bodybag_used"
+			O.desc = "Pretty useless now.."
+			del(src)
+
+	MouseDrop(over_object, src_location, over_location)
+		if((over_object == usr && (in_range(src, usr) || usr.contents.Find(src))))
+			if(!ishuman(usr))	return
+			usr << "\red You can't fold that up anymore.."
+		..()

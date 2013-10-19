@@ -86,10 +86,12 @@
 	removeVerb(/atom/movable/verb/pull)
 	log_message("[src.name] created.")
 	loc.Entered(src)
+	mechas_list += src //global mech list
 	return
 
 /obj/mecha/Del()
 	src.go_out()
+	mechas_list -= src //global mech list
 	..()
 	return
 
@@ -651,7 +653,7 @@
 /obj/mecha/attackby(obj/item/weapon/W as obj, mob/user as mob)
 
 
-	if(istype(W, /obj/item/device/mmi) || istype(W, /obj/item/device/posibrain))
+	if(istype(W, /obj/item/device/mmi) || istype(W, /obj/item/device/mmi/posibrain))
 		if(mmi_move_inside(W,user))
 			user << "[src]-MMI interface initialized successfuly"
 		else
@@ -756,6 +758,34 @@
 		W.forceMove(src)
 		user.visible_message("[user] attaches [W] to [src].", "You attach [W] to [src]")
 		return
+
+	else if(istype(W, /obj/item/weapon/paintkit))
+
+		if(occupant)
+			user << "You can't customize a mech while someone is piloting it - that would be unsafe!"
+			return
+
+		var/obj/item/weapon/paintkit/P = W
+		var/found = null
+
+		for(var/type in P.allowed_types)
+			if(type==src.initial_icon)
+				found = 1
+				break
+
+		if(!found)
+			user << "That kit isn't meant for use on this class of exosuit."
+			return
+
+		user.visible_message("[user] opens [P] and spends some quality time customising [src].")
+
+		src.name = P.new_name
+		src.desc = P.new_desc
+		src.initial_icon = P.new_icon
+		src.reset_icon()
+
+		user.drop_item()
+		del(P)
 
 	else
 		call((proc_res["dynattackby"]||src), "dynattackby")(W,user)
@@ -1136,7 +1166,7 @@
 			src.occupant.client.perspective = MOB_PERSPECTIVE
 		*/
 		src.occupant << browse(null, "window=exosuit")
-		if(istype(mob_container, /obj/item/device/mmi) || istype(mob_container, /obj/item/device/posibrain))
+		if(istype(mob_container, /obj/item/device/mmi) || istype(mob_container, /obj/item/device/mmi/posibrain))
 			var/obj/item/device/mmi/mmi = mob_container
 			if(mmi.brainmob)
 				occupant.loc = mmi
@@ -1341,7 +1371,7 @@
 /obj/mecha/proc/get_log_html()
 	var/output = "<html><head><title>[src.name] Log</title></head><body style='font: 13px 'Courier', monospace;'>"
 	for(var/list/entry in log)
-		output += {"<div style='font-weight: bold;'>[time2text(entry["time"],"DDD MMM DD hh:mm:ss")] 2555</div>
+		output += {"<div style='font-weight: bold;'>[time2text(entry["time"],"DDD MMM DD hh:mm:ss")] [game_year]</div>
 						<div style='margin-left:15px; margin-bottom:10px;'>[entry["message"]]</div>
 						"}
 	output += "</body></html>"
@@ -1544,6 +1574,9 @@
 		return
 	if(href_list["dna_lock"])
 		if(usr != src.occupant)	return
+		if(istype(occupant, /mob/living/carbon/brain))
+			occupant_message("You are a brain. No.")
+			return
 		if(src.occupant)
 			src.dna = src.occupant.dna.unique_enzymes
 			src.occupant_message("You feel a prick as the needle takes your DNA sample.")

@@ -4,10 +4,10 @@
 /obj/effect/energy_field
 	name = "energy field"
 	desc = "Impenetrable field of energy, capable of blocking anything as long as it's active."
-	icon = 'shielding.dmi'
+	icon = 'code/WorkInProgress/Cael_Aislinn/ShieldGen/shielding.dmi'
 	icon_state = "shieldsparkles"
 	anchored = 1
-	layer = 2.1
+	layer = 4.1		//just above mobs
 	density = 0
 	invisibility = 101
 	var/strength = 0

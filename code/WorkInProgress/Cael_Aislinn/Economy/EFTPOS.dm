@@ -21,6 +21,30 @@
 	spawn(0)
 		print_reference()
 
+		//create a short manual as well
+		var/obj/item/weapon/paper/R = new(src.loc)
+		R.name = "Steps to success: Correct EFTPOS Usage"
+		R.info += "<b>When first setting up your EFTPOS device:</b>"
+		R.info += "1. Memorise your EFTPOS command code (provided with all EFTPOS devices).<br>"
+		R.info += "2. Confirm that your EFTPOS device is connected to your local accounts database. For additional assistance with this step, contact NanoTrasen IT Support<br>"
+		R.info += "3. Confirm that your EFTPOS device has been linked to the account that you wish to recieve funds for all transactions processed on this device.<br>"
+		R.info += "<b>When starting a new transaction with your EFTPOS device:</b>"
+		R.info += "1. Ensure the device is UNLOCKED so that new data may be entered.<br>"
+		R.info += "2. Enter a sum of money and reference message for the new transaction.<br>"
+		R.info += "3. Lock the transaction, it is now ready for your customer.<br>"
+		R.info += "4. If at this stage you wish to modify or cancel your transaction, you may simply reset (unlock) your EFTPOS device.<br>"
+		R.info += "5. Give your EFTPOS device to the customer, they must authenticate the transaction by swiping their ID card and entering their PIN number.<br>"
+		R.info += "6. If done correctly, the transaction will be logged to both accounts with the reference you have entered, the terminal ID of your EFTPOS device and the money transferred across accounts.<br>"
+
+		//stamp the paper
+		var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
+		stampoverlay.icon_state = "paper_stamp-cent"
+		if(!R.stamped)
+			R.stamped = new
+		R.stamped += /obj/item/weapon/stamp
+		R.overlays += stampoverlay
+		R.stamps += "<HR><i>This paper has been stamped by the EFTPOS device.</i>"
+
 	//by default, connect to the station account
 	//the user of the EFTPOS device can change the target account though, and no-one will be the wiser (except whoever's being charged)
 	linked_account = station_account
@@ -46,8 +70,12 @@
 	D.name = "small parcel - 'EFTPOS access code'"
 
 /obj/item/device/eftpos/proc/reconnect_database()
-	for(var/obj/machinery/account_database/DB in world)
-		if(DB.z == src.z)
+	var/turf/location = get_turf(src)
+	if(!location)
+		return
+
+	for(var/obj/machinery/account_database/DB in machines) //Hotfix until someone finds out why it isn't in 'machines'
+		if(DB.z == location.z)
 			linked_db = DB
 			break
 
@@ -101,7 +129,11 @@
 			if("change_code")
 				var/attempt_code = input("Re-enter the current EFTPOS access code", "Confirm old EFTPOS code") as num
 				if(attempt_code == access_code)
-					access_code = input("Enter a new access code for this device", "Enter new EFTPOS code") as num
+					var/trycode = input("Enter a new access code for this device (4-6 digits, numbers only)", "Enter new EFTPOS code") as num
+					if(trycode >= 1000 && trycode <= 999999)
+						access_code = trycode
+					else
+						alert("That is not a valid code!")
 					print_reference()
 				else
 					usr << "\icon[src]<span class='warning'>Incorrect code entered.</span>"
@@ -124,7 +156,11 @@
 			if("trans_purpose")
 				transaction_purpose = input("Enter reason for EFTPOS transaction", "Transaction purpose")
 			if("trans_value")
-				transaction_amount = input("Enter amount for EFTPOS transaction", "Transaction amount") as num
+				var/try_num = input("Enter amount for EFTPOS transaction", "Transaction amount") as num
+				if(try_num < 0)
+					alert("That is not a valid amount!")
+				else
+					transaction_amount = try_num
 			if("toggle_lock")
 				if(transaction_locked)
 					var/attempt_code = input("Enter EFTPOS access code", "Reset Transaction") as num
@@ -169,7 +205,7 @@
 				var/datum/money_account/D = linked_db.attempt_account_access(C.associated_account_number, attempt_pin, 2)
 				if(D)
 					if(transaction_amount <= D.money)
-						playsound(src, 'chime.ogg', 50, 1)
+						playsound(src, 'sound/machines/chime.ogg', 50, 1)
 						src.visible_message("\icon[src] The [src] chimes.")
 						transaction_paid = 1
 
@@ -199,11 +235,11 @@
 						T.time = worldtime2text()
 						linked_account.transaction_log.Add(T)
 					else
-						usr << "\icon[src]<span class='warning'>You don't have that much money!<span>"
+						usr << "\icon[src]<span class='warning'>You don't have that much money!</span>"
 				else
 					usr << "\icon[src]<span class='warning'>Unable to access account. Check security settings and try again.</span>"
 			else
-				usr << "\icon[src]<span class='warning'>EFTPOS is not connected to an account.<span>"
+				usr << "\icon[src]<span class='warning'>EFTPOS is not connected to an account.</span>"
 	else
 		..()
 

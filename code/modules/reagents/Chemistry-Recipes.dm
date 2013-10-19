@@ -13,6 +13,8 @@ datum
 
 		var/result_amount = 0
 		var/secondary = 0 // set to nonzero if secondary reaction
+		var/list/secondary_results = list()		//additional reagents produced by the reaction
+		var/requires_heating = 0
 
 		proc
 			on_reaction(var/datum/reagents/holder, var/created_volume)
@@ -383,8 +385,10 @@ datum
 				for(var/turf/simulated/floor/target_tile in range(0,location))
 
 					var/datum/gas_mixture/napalm = new
+					var/datum/gas/volatile_fuel/fuel = new
+					fuel.moles = created_volume
+					napalm.trace_gases += fuel
 
-					napalm.toxins = created_volume*10
 					napalm.temperature = 400+T0C
 					napalm.update_values()
 
@@ -454,6 +458,13 @@ datum
 			required_reagents = list("carpotoxin" = 5, "stoxin" = 5, "copper" = 5)
 			result_amount = 2
 
+		rezadone
+			name = "Rezadone"
+			id = "rezadone"
+			result = "rezadone"
+			required_reagents = list("carpotoxin" = 1, "cryptobiolin" = 1, "copper" = 1)
+			result_amount = 3
+
 		mindbreaker
 			name = "Mindbreaker Toxin"
 			id = "mindbreaker"
@@ -478,13 +489,24 @@ datum
 				var/location = get_turf(holder.my_atom)
 				new /obj/item/stack/sheet/mineral/plasma(location)
 				return
+
+		plastication
+			name = "Plastic"
+			id = "solidplastic"
+			result = null
+			required_reagents = list("pacid" = 10, "plasticide" = 20)
+			result_amount = 1
+			on_reaction(var/datum/reagents/holder)
+				new /obj/item/stack/sheet/mineral/plastic(get_turf(holder.my_atom),10)
+				return
+
 		virus_food
 			name = "Virus Food"
 			id = "virusfood"
 			result = "virusfood"
 			required_reagents = list("water" = 5, "milk" = 5, "oxygen" = 5)
 			result_amount = 15
-
+/*
 		mix_virus
 			name = "Mix Virus"
 			id = "mixvirus"
@@ -522,7 +544,7 @@ datum
 						var/datum/disease/advance/D = locate(/datum/disease/advance) in B.data["viruses"]
 						if(D)
 							D.Devolve()
-
+*/
 		condensedcapsaicin
 			name = "Condensed Capsaicin"
 			id = "condensedcapsaicin"
@@ -1002,7 +1024,7 @@ datum
 			required_other = 1
 			on_reaction(var/datum/reagents/holder)
 
-				var/blocked = list(/mob/living/simple_animal/hostile,
+				/*var/blocked = list(/mob/living/simple_animal/hostile,
 					/mob/living/simple_animal/hostile/pirate,
 					/mob/living/simple_animal/hostile/pirate/ranged,
 					/mob/living/simple_animal/hostile/russian,
@@ -1013,6 +1035,9 @@ datum
 					/mob/living/simple_animal/hostile/syndicate/ranged,
 					/mob/living/simple_animal/hostile/syndicate/ranged/space,
 					/mob/living/simple_animal/hostile/alien/queen/large,
+					/mob/living/simple_animal/hostile/faithless,
+					/mob/living/simple_animal/hostile/panther,
+					/mob/living/simple_animal/hostile/snake,
 					/mob/living/simple_animal/hostile/retaliate,
 					/mob/living/simple_animal/hostile/retaliate/clown
 					)//exclusion list for things you don't want the reaction to create.
@@ -1031,7 +1056,9 @@ datum
 					C.loc = get_turf_loc(holder.my_atom)
 					if(prob(50))
 						for(var/j = 1, j <= rand(1, 3), j++)
-							step(C, pick(NORTH,SOUTH,EAST,WEST))
+							step(C, pick(NORTH,SOUTH,EAST,WEST))*/
+				for(var/mob/O in viewers(get_turf_loc(holder.my_atom), null))
+					O.show_message(text("\red The slime core fizzles disappointingly,"), 1)
 
 //Silver
 		slimebork
@@ -1455,6 +1482,13 @@ datum
 			id = "vodka"
 			result = "vodka"
 			required_reagents = list("potato" = 10)
+			required_catalysts = list("enzyme" = 5)
+			result_amount = 10
+		sake
+			name = "Sake"
+			id = "sake"
+			result = "sake"
+			required_reagents = list("rice" = 10)
 			required_catalysts = list("enzyme" = 5)
 			result_amount = 10
 
@@ -1882,4 +1916,41 @@ datum
 			result = "driestmartini"
 			required_reagents = list("nothing" = 1, "gin" = 1)
 			result_amount = 2
+
+		lemonade
+			name = "Lemonade"
+			id = "lemonade"
+			result = "lemonade"
+			required_reagents = list("lemonjuice" = 1, "sugar" = 1, "water" = 1)
+			result_amount = 3
+
+		kiraspecial
+			name = "Kira Special"
+			id = "kiraspecial"
+			result = "kiraspecial"
+			required_reagents = list("orangejuice" = 1, "limejuice" = 1, "sodawater" = 1)
+			result_amount = 2
+
+		brownstar
+			name = "Brown Star"
+			id = "brownstar"
+			result = "brownstar"
+			required_reagents = list("orangejuice" = 2, "cola" = 1)
+			result_amount = 2
+
+		milkshake
+			name = "Milkshake"
+			id = "milkshake"
+			result = "milkshake"
+			required_reagents = list("cream" = 1, "ice" = 2, "milk" = 2)
+			result_amount = 5
+
+		rewriter
+			name = "Rewriter"
+			id = "rewriter"
+			result = "rewriter"
+			required_reagents = list("spacemountainwind" = 1, "coffee" = 1)
+			result_amount = 2
+
+
 
