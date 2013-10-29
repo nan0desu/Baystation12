@@ -154,7 +154,13 @@ obj
 
 			for(var/mob/living/carbon/human/M in loc)
 				M.FireBurn(temperature, min(max(0.1,firelevel / 20),10)) //Burn the humans!
+				M.fire_act()
 
+			for(var/mob/living/carbon/monkey/A in loc)
+				A.fire_act()
+
+			for(var/mob/living/carbon/alien/humanoid/X in loc)
+				X.fire_act()
 
 		New(newLoc,fl)
 			..()
