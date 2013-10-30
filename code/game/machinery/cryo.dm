@@ -5,7 +5,7 @@
 	density = 1
 	anchored = 1.0
 	layer = 2.8
-	
+
 	var/on = 0
 	var/temperature_archived
 	var/mob/living/carbon/occupant = null
@@ -78,7 +78,7 @@
 		return
 
 	// this is the data which will be sent to the ui
-	var/data[0]	
+	var/data[0]
 	data["isOperating"] = on
 	data["hasOccupant"] = occupant ? 1 : 0
 
@@ -122,7 +122,7 @@
 	data["beakerContents"] = beakerContents
 
 	var/datum/nanoui/ui = nanomanager.get_open_ui(user, src, ui_key)
-	if (!ui) 
+	if (!ui)
 		// the ui does not exist, so we'll create a new one
 		ui = new(user, src, ui_key, "cryo.tmpl", "Cryo Cell Control System", 520, 410)
 		// When the UI is first opened this is the data it will use
@@ -146,7 +146,7 @@
 	if(href_list["switchOn"])
 		on = 1
 		update_icon()
-		
+
 	if(href_list["switchOff"])
 		on = 0
 		update_icon()
@@ -156,12 +156,12 @@
 			var/obj/item/weapon/reagent_containers/glass/B = beaker
 			B.loc = get_step(loc, SOUTH)
 			beaker = null
-			
+
 	if(href_list["ejectOccupant"])
 		if(!occupant || isslime(usr) || ispAI(usr))
 			return 0 // don't update UIs attached to this object
 		go_out()
-	
+
 	add_fingerprint(usr)
 	return 1 // update UIs attached to this object
 
@@ -286,6 +286,7 @@
 //	M.metabslow = 1
 	add_fingerprint(usr)
 	update_icon()
+	M.ExtinguishMob() //Cryo extingguish occupant
 	return 1
 
 /obj/machinery/atmospherics/unary/cryo_cell/verb/move_eject()
