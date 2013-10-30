@@ -1,5 +1,11 @@
 // BEGIN_INTERNALS
 /*
+MAP_ICON_TYPE: 0
+WINDOW: code\modules\mob\living\living_defense.dm;code\modules\mob\living\living.dm;code\modules\mob\living\carbon\human\life.dm;code\modules\mob\screen.dm;code\modules\mob\living\carbon\monkey\update_icons.dm;code\modules\mob\living\simple_animal\simple_animal.dm;code\WorkInProgress\kilakk\fax.dm;baystation12.dme;code\modules\admin\topic.dm;code\game\mecha\working\working.dm;code\datums\spells\ethereal_jaunt.dm;code\game\machinery\cryo.dm;icons\obj\objects.dmi;icons\obj\items.dmi;icons\obj\custom_items.dmi;code\game\objects\items\weapons\AI_modules.dm;code\game\objects\items\devices\pipe_painter.dm;code\modules\paperwork\photocopier.dm;code\game\machinery\doors\airlock.dm;code\game\machinery\doors\door.dm;code\game\machinery\doors\firedoor.dm;icons\mob\items_lefthand.dmi;icons\mob\items_righthand.dmi;code\game\objects\items\weapons\airlock_painter.dm;code\game\objects\structures\door_assembly.dm;maps\tgstation2.dmm
+LAST_COMPILE_VERSION: 500.1213
+DIR: code code\__HELPERS code\game code\game\gamemodes\changeling code\game\gamemodes\heist code\game\machinery code\game\machinery\doors code\game\machinery\telecomms code\game\mecha\equipment code\game\mecha\equipment\weapons code\game\mecha\working code\game\objects code\game\objects\items code\game\objects\items\devices code\game\objects\items\weapons code\game\objects\structures code\modules code\modules\admin code\modules\mob\living code\modules\mob\living\carbon code\modules\mob\living\carbon\human code\modules\mob\living\carbon\monkey code\modules\mob\living\simple_animal code\modules\paperwork code\WorkInProgress icons icons\mob icons\obj maps 
+FILE: maps\tgstation2.dmm
+LAST_COMPILE_TIME: 1383133042
 AUTO_FILE_DIR: OFF
 */
 // END_INTERNALS
