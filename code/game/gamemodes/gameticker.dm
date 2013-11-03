@@ -40,6 +40,7 @@ var/global/datum/controller/gameticker/ticker
 	login_music = pick(\
 	'sound/music/space.ogg',\
 	'sound/music/traitor.ogg',\
+	'sound/music/sundown.ogg',\
 	'sound/music/space_oddity.ogg') //Ground Control to Major Tom, this song is cool, what's going on?
 	do
 		pregame_timeleft = 180
