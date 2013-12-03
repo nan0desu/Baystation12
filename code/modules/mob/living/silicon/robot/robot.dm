@@ -148,7 +148,7 @@
 /mob/living/silicon/robot/proc/pick_module()
 	if(module)
 		return
-	var/list/modules = list("Standard", "Engineering", "Medical", "Miner", "Janitor", "Service", "Security")
+	var/list/modules = list("Standard", "Engineering", "Medical", "Miner", "Janitor", "Service", "Security", "Science")
 	if(crisis && security_level == SEC_LEVEL_RED) //Leaving this in until it's balanced appropriately.
 		src << "\red Crisis mode active. Combat module available."
 		modules+="Combat"
@@ -174,6 +174,15 @@
 			module_sprites["Bro"] = "Brobot"
 			module_sprites["Rich"] = "maximillion"
 			module_sprites["Default"] = "Service2"
+
+		if("Science")
+			module = new /obj/item/weapon/robot_module/science(src)
+			channels = list("Science" = 1)
+			if(camera && "Robots" in camera.network)
+				camera.network.Add("Science")
+			module_sprites["Toxin"] = "toxbot"
+			module_sprites["Xenobio"] = "xenobot"
+
 
 		if("Miner")
 			module = new /obj/item/weapon/robot_module/miner(src)
@@ -947,11 +956,6 @@
 			var/obj/item/broken_device = cell_component.wrapped
 			user << "You remove \the [broken_device]."
 			user.put_in_active_hand(broken_device)
-
-	if(ishuman(user))
-		if(istype(user:gloves, /obj/item/clothing/gloves/space_ninja)&&user:gloves:candrain&&!user:gloves:draining)
-			call(/obj/item/clothing/gloves/space_ninja/proc/drain)("CYBORG",src,user:wear_suit)
-			return
 
 /mob/living/silicon/robot/proc/allowed(mob/M)
 	//check if it doesn't require any access at all
