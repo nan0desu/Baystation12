@@ -1,4 +1,3 @@
-
 // fun if you want to typecast humans/monkeys/etc without writing long path-filled lines.
 /proc/ishuman(A)
 	if(istype(A, /mob/living/carbon/human))
@@ -247,25 +246,43 @@ proc/slur(phrase)
 			if(lowertext(newletter)=="s")	newletter="ch"
 			if(lowertext(newletter)=="a")	newletter="ah"
 			if(lowertext(newletter)=="c")	newletter="k"
+			if(newletter == "×" || newletter == "÷")	newletter = "ù"
+			if(newletter == "Å" || newletter == "å")	newletter = "è"
+
 		switch(rand(1,15))
-			if(1,3,5,8)	newletter="[lowertext(newletter)]"
-			if(2,4,6,15)	newletter="[uppertext(newletter)]"
+			if(1,3,5,8)
+				newletter = "[lowertext(newletter)]"
+				if(text2ascii(newletter) >223 && text2ascii(newletter) < 256)
+					newletter = ascii2text(text2ascii(newletter) - 32)
+			if(2,4,6,15)
+				newletter = "[uppertext(newletter)]"
+				if(text2ascii(newletter) >191 && text2ascii(newletter) < 224)
+					newletter = ascii2text(text2ascii(newletter) + 32)
 			if(7)	newletter+="'"
-			//if(9,10)	newletter="<b>[newletter]</b>"
 			//if(11,12)	newletter="<big>[newletter]</big>"
 			//if(13)	newletter="<small>[newletter]</small>"
 		newphrase+="[newletter]";counter-=1
 	return newphrase
+
 
 /proc/stutter(n)
 	var/te = html_decode(n)
 	var/t = ""//placed before the message. Not really sure what it's for.
 	n = length(n)//length of the entire word
 	var/p = null
+	var/rus = 0
+	var/offset = 0
 	p = 1//1 is the start of any word
 	while(p <= n)//while P, which starts at 1 is less or equal to N which is the length.
 		var/n_letter = copytext(te, p, p + 1)//copies text from a certain distance. In this case, only one letter at a time.
-		if (prob(80) && (ckey(n_letter) in list("b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z")))
+		if (text2ascii(n_letter) >191 && text2ascii(n_letter) < 256)
+			offset = 0
+			rus = 0
+			if (text2ascii(n_letter) >191 && text2ascii(n_letter) < 224)
+				offset = 32
+			if (ascii2text((text2ascii(n_letter) + offset)) in list("á","â","ã","ä","æ","ç","é","ê","ë","ì","í","ï","ð","ñ","ò","ô","õ","ö","÷","ø","ù"))
+				rus = 1
+		if (prob(80) && ((ckey(n_letter) in list("b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z")) || rus == 1))
 			if (prob(10))
 				n_letter = text("[n_letter]-[n_letter]-[n_letter]-[n_letter]")//replaces the current letter with this instead.
 			else
