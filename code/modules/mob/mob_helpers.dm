@@ -259,41 +259,38 @@ proc/slur(phrase)
 				if(text2ascii(newletter) >191 && text2ascii(newletter) < 224)
 					newletter = ascii2text(text2ascii(newletter) + 32)
 			if(7)	newletter+="'"
-			//if(11,12)	newletter="<big>[newletter]</big>"
-			//if(13)	newletter="<small>[newletter]</small>"
 		newphrase+="[newletter]";counter-=1
 	return newphrase
 
 
-/proc/stutter(n)
-	var/te = html_decode(n)
-	var/t = ""//placed before the message. Not really sure what it's for.
-	n = length(n)//length of the entire word
-	var/p = null
-	var/rus = 0
-	var/offset = 0
-	p = 1//1 is the start of any word
-	while(p <= n)//while P, which starts at 1 is less or equal to N which is the length.
-		var/n_letter = copytext(te, p, p + 1)//copies text from a certain distance. In this case, only one letter at a time.
-		if (text2ascii(n_letter) >191 && text2ascii(n_letter) < 256)
-			offset = 0
-			rus = 0
-			if (text2ascii(n_letter) >191 && text2ascii(n_letter) < 224)
-				offset = 32
-			if (ascii2text((text2ascii(n_letter) + offset)) in list("á","â","ã","ä","æ","ç","é","ê","ë","ì","í","ï","ð","ñ","ò","ô","õ","ö","÷","ø","ù"))
-				rus = 1
-		if (prob(80) && ((ckey(n_letter) in list("b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z")) || rus == 1))
+/proc/stutter(text)
+	text = html_decode(text)
+	var/t = ""
+	var/lenght = length(text)//length of the entire word
+	var/alphabet = "bcdfghjklmnpqrstvwxyzáâãäæçéêëìíïðñòôõö÷øù"
+	var/letter
+	var/lcase_letter
+	var/tletter
+	var/p = 1
+	while(p <= lenght)//while P, which starts at 1 is less or equal to N which is the length.
+		letter = copytext(text, p, p + 1)//copies text from a certain distance. In this case, only one letter at a time.
+		tletter = letter
+		lcase_letter = text2ascii(letter)
+		world << lcase_letter
+		if((lcase_letter >= 65 && lcase_letter <=90) || (lcase_letter >= 192 && lcase_letter <=223))
+			tletter = ascii2text(lcase_letter + 32)	
+		if (prob(80) && (findtext(alphabet,tletter)))
 			if (prob(10))
-				n_letter = text("[n_letter]-[n_letter]-[n_letter]-[n_letter]")//replaces the current letter with this instead.
+				letter = text("[letter]-[letter]-[letter]-[letter]")//replaces the current letter with this instead.
 			else
 				if (prob(20))
-					n_letter = text("[n_letter]-[n_letter]-[n_letter]")
+					letter = text("[letter]-[letter]-[letter]")
 				else
 					if (prob(5))
-						n_letter = null
+						letter = null
 					else
-						n_letter = text("[n_letter]-[n_letter]")
-		t = text("[t][n_letter]")//since the above is ran through for each letter, the text just adds up back to the original word.
+						letter = text("[letter]-[letter]")
+		t = text("[t][letter]")//since the above is ran through for each letter, the text just adds up back to the original word.
 		p++//for each letter p is increased to find where the next letter will be.
 	return copytext(sanitize(t),1,MAX_MESSAGE_LEN)
 
