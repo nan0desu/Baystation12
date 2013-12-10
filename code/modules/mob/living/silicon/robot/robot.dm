@@ -148,7 +148,7 @@
 /mob/living/silicon/robot/proc/pick_module()
 	if(module)
 		return
-	var/list/modules = list("Standard", "Engineering", "Medical", "Miner", "Janitor", "Service", "Security")
+	var/list/modules = list("Standard", "Engineering", "Medical", "Miner", "Janitor", "Service", "Security", "Science")
 	if(crisis && security_level == SEC_LEVEL_RED) //Leaving this in until it's balanced appropriately.
 		src << "\red Crisis mode active. Combat module available."
 		modules+="Combat"
@@ -221,6 +221,14 @@
 			module = new /obj/item/weapon/robot_module/combat(src)
 			module_sprites["Combat Android"] = "droid-combat"
 			channels = list("Security" = 1)
+
+		if("Science")
+			module = new /obj/item/weapon/robot_module/science(src)
+			channels = list("Science" = 1)
+			if(camera && "Robots" in camera.network)
+				camera.network.Add("Science")
+			module_sprites["Toxin"] = "toxbot"
+			module_sprites["Xenobio"] = "xenobot"
 
 	//Custom_sprite check and entry
 	if (custom_sprite == 1)
