@@ -18,8 +18,6 @@ var/global/list/surgery_steps = list()				//list of all surgery steps  |BS12
 var/global/list/side_effects = list()				//list of all medical sideeffects types by thier names |BS12
 var/global/list/mechas_list = list()				//list of all mechs. Used by hostile mobs target tracking.
 
-var/global/list/blueprint_recipie_list				//list of all /datum/blueprints datums. Used by crafting
-
 //Languages/species/whitelist.
 var/global/list/all_species[0]
 var/global/list/all_languages[0]
