@@ -2395,7 +2395,7 @@ datum
 			on_mob_life(var/mob/living/M as mob)
 				if(!M) M = holder.my_atom
 				M.nutrition += nutriment_factor
-				holder.remove_reagent(src.id, FOOD_METABOLISM)
+				//holder.remove_reagent(src.id, FOOD_METABOLISM)
 				// Drinks should be used up faster than other reagents.
 				holder.remove_reagent(src.id, FOOD_METABOLISM)
 				if (adj_dizzy) M.dizziness = max(0,M.dizziness + adj_dizzy)
@@ -2940,7 +2940,7 @@ datum
 
 			on_mob_life(var/mob/living/M as mob)
 				M:nutrition += nutriment_factor
-				holder.remove_reagent(src.id, FOOD_METABOLISM)
+				holder.remove_reagent(src.id, REAGENTS_METABOLISM)
 
 				if (adj_drowsy)	M.drowsyness = max(0,M.drowsyness + adj_drowsy)
 				if (adj_sleepy) M.sleeping = max(0,M.sleeping + adj_sleepy)
