@@ -1381,6 +1381,12 @@
 				var/obj/item/clothing/glasses/welding/O = glasses
 				if(!O.up && tinted_weldhelh)
 					client.screen += global_hud.darkMask
+					
+			if(istype(glasses, /obj/item/clothing/glasses/meson) || istype(glasses, /obj/item/clothing/glasses/night) || istype(glasses, /obj/item/clothing/glasses/gglasses))
+				client.screen += global_hud.meson
+
+			if(istype(glasses, /obj/item/clothing/glasses/thermal) )
+				client.screen += global_hud.thermal
 
 			if(istype(glasses, /obj/item/clothing/glasses/meson) || istype(glasses, /obj/item/clothing/glasses/night) || istype(glasses, /obj/item/clothing/glasses/gglasses))
 				client.screen += global_hud.meson
