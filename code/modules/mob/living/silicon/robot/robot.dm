@@ -127,7 +127,7 @@
 		var/datum/robot_component/cell_component = components["power cell"]
 		cell_component.wrapped = cell
 		cell_component.installed = 1
-	
+
 	hud_list[HEALTH_HUD]      = image('icons/mob/hud.dmi', src, "hudblank")
 	hud_list[STATUS_HUD]      = image('icons/mob/hud.dmi', src, "hudhealth100")
 	hud_list[ID_HUD]          = image('icons/mob/hud.dmi', src, "hudblank")
@@ -136,9 +136,9 @@
 	hud_list[IMPCHEM_HUD]     = image('icons/mob/hud.dmi', src, "hudblank")
 	hud_list[IMPTRACK_HUD]    = image('icons/mob/hud.dmi', src, "hudblank")
 	hud_list[SPECIALROLE_HUD] = image('icons/mob/hud.dmi', src, "hudblank")
-	
 
-	
+
+
 
 	playsound(loc, 'sound/voice/liveagain.ogg', 75, 1)
 
@@ -1305,7 +1305,7 @@
 		icon_state = module_sprites[1]
 		return
 
-	if(icontype == "Custom")
+	if(icontype == "Custom" || tc_borg)
 		icon = 'tauceti/icons/mob/robot.dmi'
 	else
 		icon = 'icons/mob/robots.dmi'
