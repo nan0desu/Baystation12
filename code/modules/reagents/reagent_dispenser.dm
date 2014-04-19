@@ -1,5 +1,4 @@
 
-
 /obj/structure/reagent_dispensers
 	name = "Dispenser"
 	desc = "..."
@@ -220,3 +219,15 @@
 	New()
 		..()
 		reagents.add_reagent("virusfood", 1000)
+
+/obj/structure/reagent_dispensers/radium
+	name = "Radium Dispenser"
+	desc = "A dispenser of radium."
+	icon = 'icons/obj/objects.dmi'
+	icon_state = "virusfoodtank"
+	amount_per_transfer_from_this = 5
+	anchored = 1
+
+	New()
+		..()
+		reagents.add_reagent("radium", 100)
