@@ -17,6 +17,9 @@ world/IsBanned(key,address,computer_id)
 		AddBan(ckey(key), computer_id, "Use of ToR", "Automated Ban", 0, 0)
 		return list("reason"="Using ToR", "desc"="\nReason: The network you are using to connect has been banned.\nIf you believe this is a mistake, please request help at [config.banappeals]")
 
+	if(!global_whitelist_check(key))
+		message_admins("[key] trying to join, but WHITELIST")
+		return list("reason"="Whitelist", "desc"="\nYou shall not pass!!!\nThis server uses whitelist, SORRY")
 
 	if(config.ban_legacy_system)
 
