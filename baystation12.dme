@@ -1352,6 +1352,7 @@
 #include "interface\interface.dm"
 #include "interface\skin.dmf"
 #include "maps\tauceti.1.3.dmm"
+#include "tauceti\_sigma\credits.dm"
 #include "tauceti\_sigma\whitelist.dm"
 #include "tauceti\datums\uplinks_items.dm"
 #include "tauceti\datums\wires\syndicatebomb.dm"

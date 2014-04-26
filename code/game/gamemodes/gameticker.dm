@@ -347,6 +347,7 @@ var/global/datum/controller/gameticker/ticker
 
 
 /datum/controller/gameticker/proc/declare_completion()
+	credits()
 
 	for (var/mob/living/silicon/ai/aiPlayer in mob_list)
 		if (aiPlayer.stat != 2)
