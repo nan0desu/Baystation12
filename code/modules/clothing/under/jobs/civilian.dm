@@ -17,6 +17,14 @@
 	item_color = "captain"
 	flags = FPRINT | TABLEPASS | ONESIZEFITSALL
 
+/obj/item/clothing/under/rank/capcamsole //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
+	desc = "It's a blue feminine camisole with some gold markings denoting the rank of \"Captain\" and gold aquila on it."
+	name = "captain's camisole"
+	icon_state = "capcamisole"
+	item_state = "capcamisole"
+	item_color = "captain"
+	flags = FPRINT | TABLEPASS | ONESIZEFITSALL
+
 
 /obj/item/clothing/under/rank/cargo
 	name = "quartermaster's jumpsuit"
