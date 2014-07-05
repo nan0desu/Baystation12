@@ -78,6 +78,9 @@
 
 
 /datum/game_mode/proc/forge_traitor_objectives(var/datum/mind/traitor)
+	if (config.objectives_disabled)
+		return
+
 	if(istype(traitor.current, /mob/living/silicon))
 		var/datum/objective/assassinate/kill_objective1 = new
 		kill_objective1.owner = traitor
@@ -211,7 +214,7 @@
 				text += "body destroyed"
 			text += ")"
 
-			if(traitor.objectives.len)//If the traitor had no objectives, don't need to process this.
+			if(traitor.objectives && traitor.objectives.len)//If the traitor had no objectives, don't need to process this.
 				var/count = 1
 				for(var/datum/objective/objective in traitor.objectives)
 					if(objective.check_completion())
