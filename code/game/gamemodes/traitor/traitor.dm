@@ -124,7 +124,7 @@
 
 /datum/game_mode/proc/add_one_objective(var/datum/mind/traitor)
 	switch(rand(1,120))
-		if(1 to 20
+		if(1 to 20)
 			var/datum/objective/assassinate/kill_objective = new
 			kill_objective.owner = traitor
 			kill_objective.find_target()
