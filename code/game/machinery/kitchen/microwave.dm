@@ -1,6 +1,5 @@
-
 /obj/machinery/microwave
-	name = "Microwave"
+	name = "microwave"
 	icon = 'icons/obj/kitchen.dmi'
 	icon_state = "mw"
 	layer = 2.9
@@ -17,6 +16,7 @@
 	var/global/list/acceptable_items // List of the items you can put in
 	var/global/list/acceptable_reagents // List of the reagents you can put in
 	var/global/max_n_of_items = 0
+	var/efficiency = 0
 
 
 // see code/modules/food/recipes_microwave.dm for recipes
@@ -26,35 +26,52 @@
 ********************/
 
 /obj/machinery/microwave/New()
-	..()
-	reagents = new/datum/reagents(100)
-	reagents.my_atom = src
-	if (!available_recipes)
+	create_reagents(100)
+	if(!available_recipes)
 		available_recipes = new
-		for (var/type in (typesof(/datum/recipe)-/datum/recipe))
-			available_recipes+= new type
+		for(var/type in (typesof(/datum/recipe) - /datum/recipe))
+			available_recipes += new type
 		acceptable_items = new
 		acceptable_reagents = new
-		for (var/datum/recipe/recipe in available_recipes)
-			for (var/item in recipe.items)
+		for(var/datum/recipe/recipe in available_recipes)
+			for(var/item in recipe.items)
 				acceptable_items |= item
-			for (var/reagent in recipe.reagents)
+			for(var/reagent in recipe.reagents)
 				acceptable_reagents |= reagent
-			if (recipe.items)
-				max_n_of_items = max(max_n_of_items,recipe.items.len)
+			if(recipe.items)
+				max_n_of_items = max(max_n_of_items, recipe.items.len)
 
-		// This will do until I can think of a fun recipe to use dionaea in -
-		// will also allow anything using the holder item to be microwaved into
-		// impure carbon. ~Z
-		acceptable_items |= /obj/item/weapon/holder
+	component_parts = list()
+	component_parts += new /obj/item/weapon/circuitboard/microwave(null)
+	component_parts += new /obj/item/weapon/stock_parts/micro_laser(null)
+	component_parts += new /obj/item/weapon/stock_parts/console_screen(null)
+	component_parts += new /obj/item/weapon/cable_coil(null, 2)
+	RefreshParts()
+
+/obj/machinery/microwave/RefreshParts()
+	var/E
+	for(var/obj/item/weapon/stock_parts/micro_laser/M in component_parts)
+		E += M.rating
+	efficiency = E
 
 /*******************
 *   Item Adding
 ********************/
 
 /obj/machinery/microwave/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	if(!broken && !dirty && !operating)
+		if(default_deconstruction_screwdriver(user, "mw-o", "mw", O))
+			return
+		if(default_unfasten_wrench(user, O))
+			return
+
+	if(exchange_parts(user, O))
+		return
+
+	default_deconstruction_crowbar(O)
+
 	if(src.broken > 0)
-		if(src.broken == 2 && istype(O, /obj/item/weapon/screwdriver)) // If it's broken and they're using a screwdriver
+		if(src.broken == 2 && istype(O, /obj/item/weapon/wirecutters)) // If it's broken and they're using a screwdriver
 			user.visible_message( \
 				"\blue [user] starts to fix part of the microwave.", \
 				"\blue You start to fix part of the microwave." \
@@ -65,7 +82,7 @@
 					"\blue You have fixed part of the microwave." \
 				)
 				src.broken = 1 // Fix it a bit
-		else if(src.broken == 1 && istype(O, /obj/item/weapon/wrench)) // If it's broken and they're doing the wrench
+		else if(src.broken == 1 && istype(O, /obj/item/weapon/weldingtool)) // If it's broken and they're doing the wrench
 			user.visible_message( \
 				"\blue [user] starts to fix part of the microwave.", \
 				"\blue You start to fix part of the microwave." \
@@ -79,27 +96,46 @@
 				src.broken = 0 // Fix it!
 				src.dirty = 0 // just to be sure
 				src.flags = OPENCONTAINER
+				return 0 //to use some fuel
 		else
 			user << "\red It's broken!"
 			return 1
-	else if(src.dirty==100) // The microwave is all dirty so can't be used!
-		if(istype(O, /obj/item/weapon/reagent_containers/spray/cleaner)) // If they're trying to clean it then let them
+	else if(istype(O, /obj/item/weapon/reagent_containers/spray/))
+		var/obj/item/weapon/reagent_containers/spray/clean_spray = O
+		if(clean_spray.reagents.has_reagent("cleaner",clean_spray.amount_per_transfer_from_this))
+			clean_spray.reagents.remove_reagent("cleaner",clean_spray.amount_per_transfer_from_this,1)
+			playsound(loc, 'sound/effects/spray3.ogg', 50, 1, -6)
 			user.visible_message( \
-				"\blue [user] starts to clean the microwave.", \
-				"\blue You start to clean the microwave." \
+				"\blue [user]  has cleaned  the microwave.", \
+				"\blue You have cleaned the microwave." \
 			)
-			if (do_after(user,20))
-				user.visible_message( \
-					"\blue [user]  has cleaned  the microwave.", \
-					"\blue You have cleaned the microwave." \
-				)
-				src.dirty = 0 // It's clean!
-				src.broken = 0 // just to be sure
-				src.icon_state = "mw"
-				src.flags = OPENCONTAINER
-		else //Otherwise bad luck!!
-			user << "\red It's dirty!"
+			src.dirty = 0 // It's clean!
+			src.broken = 0 // just to be sure
+			src.icon_state = "mw"
+			src.flags = OPENCONTAINER
+			src.updateUsrDialog()
+			return 1 // Disables the after-attack so we don't spray the floor/user.
+		else
+			user << "\red You need more space cleaner!"
 			return 1
+
+	else if(istype(O, /obj/item/weapon/soap/)) // If they're trying to clean it then let them
+		user.visible_message( \
+			"\blue [user] starts to clean the microwave.", \
+			"\blue You start to clean the microwave." \
+		)
+		if (do_after(user,20))
+			user.visible_message( \
+				"\blue [user]  has cleaned  the microwave.", \
+				"\blue You have cleaned the microwave." \
+			)
+			src.dirty = 0 // It's clean!
+			src.broken = 0 // just to be sure
+			src.icon_state = "mw"
+			src.flags = OPENCONTAINER
+	else if(src.dirty==100) // The microwave is all dirty so can't be used!
+		user << "\red It's dirty!"
+		return 1
 	else if(is_type_in_list(O,acceptable_items))
 		if (contents.len>=max_n_of_items)
 			user << "\red This [src] is full of ingredients, you cannot put more."
@@ -111,8 +147,10 @@
 				"\blue [user] has added one of [O] to \the [src].", \
 				"\blue You add one of [O] to \the [src].")
 		else
-		//	user.before_take_item(O)	//This just causes problems so far as I can tell. -Pete
-			user.drop_item()
+		//	user.unEquip(O)	//This just causes problems so far as I can tell. -Pete
+			if(!user.drop_item())
+				user << "<span class='notice'>\the [O] is stuck to your hand, you cannot put it in \the [src]</span>"
+				return 0
 			O.loc = src
 			user.visible_message( \
 				"\blue [user] has added \the [O] to \the [src].", \
@@ -152,13 +190,15 @@
 ********************/
 
 /obj/machinery/microwave/interact(mob/user as mob) // The microwave Menu
-	var/dat = ""
+	if(panel_open)
+		return
+	var/dat = "<div class='statusDisplay'>"
 	if(src.broken > 0)
-		dat = {"<TT>Bzzzzttttt</TT>"}
+		dat += "ERROR: 09734014-A2379-D18746 --Bad memory<BR>Contact your operator or use command line to rebase memory ///git checkout {HEAD} -a commit pull --rebase push {*NEW HEAD*}</div>"    //Thats how all the git fiddling looks to me
 	else if(src.operating)
-		dat = {"<TT>Microwaving in progress!<BR>Please wait...!</TT>"}
+		dat += "Microwaving in progress!<BR>Please wait...!</div>"
 	else if(src.dirty==100)
-		dat = {"<TT>This microwave is dirty!<BR>Please clean it before use!</TT>"}
+		dat += "ERROR: >> 0 --Responce input zero<BR>Contact your operator of the device manifactor support.</div>"
 	else
 		var/list/items_counts = new
 		var/list/items_measures = new
@@ -175,9 +215,9 @@
 				items_measures[display_name] = "slab of meat"
 				items_measures_p[display_name] = "slabs of meat"
 			if (istype(O,/obj/item/weapon/reagent_containers/food/snacks/donkpocket))
-				display_name = "Turnovers"
-				items_measures[display_name] = "turnover"
-				items_measures_p[display_name] = "turnovers"
+				display_name = "Donk Pockets"
+				items_measures[display_name] = "donk pocket"
+				items_measures_p[display_name] = "donk pockets"
 			if (istype(O,/obj/item/weapon/reagent_containers/food/snacks/carpmeat))
 				items_measures[display_name] = "fillet of meat"
 				items_measures_p[display_name] = "fillets of meat"
@@ -185,35 +225,32 @@
 		for (var/O in items_counts)
 			var/N = items_counts[O]
 			if (!(O in items_measures))
-				dat += {"<B>[capitalize(O)]:</B> [N] [lowertext(O)]\s<BR>"}
+				dat += "[capitalize(O)]: [N] [lowertext(O)]\s<BR>"
 			else
 				if (N==1)
-					dat += {"<B>[capitalize(O)]:</B> [N] [items_measures[O]]<BR>"}
+					dat += "[capitalize(O)]: [N] [items_measures[O]]<BR>"
 				else
-					dat += {"<B>[capitalize(O)]:</B> [N] [items_measures_p[O]]<BR>"}
+					dat += "[capitalize(O)]: [N] [items_measures_p[O]]<BR>"
 
 		for (var/datum/reagent/R in reagents.reagent_list)
 			var/display_name = R.name
 			if (R.id == "capsaicin")
-				display_name = "Hotsauce"
+				display_name = "hot sauce"
 			if (R.id == "frostoil")
-				display_name = "Coldsauce"
-			dat += {"<B>[display_name]:</B> [R.volume] unit\s<BR>"}
+				display_name = "cold sauce"
+			dat += "[display_name]: [R.volume] unit\s<BR>"
 
 		if (items_counts.len==0 && reagents.reagent_list.len==0)
-			dat = {"<B>The microwave is empty</B><BR>"}
+			dat += "The microwave is empty.</div>"
 		else
-			dat = {"<b>Ingredients:</b><br>[dat]"}
-		dat += {"<HR><BR>\
-<A href='?src=\ref[src];action=cook'>Turn on!<BR>\
-<A href='?src=\ref[src];action=dispose'>Eject ingredients!<BR>\
-"}
+			dat = "<h3>Ingredients:</h3>[dat]</div>"
+		dat += "<A href='?src=\ref[src];action=cook'>Turn on</A>"
+		dat += "<A href='?src=\ref[src];action=dispose'>Eject ingredients</A>"
 
-	user << browse("<HEAD><TITLE>Microwave Controls</TITLE></HEAD><TT>[dat]</TT>", "window=microwave")
-	onclose(user, "microwave")
+	var/datum/browser/popup = new(user, "microwave", name, 300, 300)
+	popup.set_content(dat)
+	popup.open()
 	return
-
-
 
 /***********************************
 *   Microwave Menu Handling/Cooking
@@ -274,6 +311,8 @@
 		stop()
 		if(cooked)
 			cooked.loc = src.loc
+		for(var/i=1,i<efficiency,i++)
+			cooked = new cooked.type(loc)
 		return
 
 /obj/machinery/microwave/proc/wzhzhzh(var/seconds as num)
@@ -359,12 +398,12 @@
 	return ffuu
 
 /obj/machinery/microwave/Topic(href, href_list)
-	if(..())
+	if(..() || panel_open)
 		return
 
 	usr.set_machine(src)
 	if(src.operating)
-		src.updateUsrDialog()
+		updateUsrDialog()
 		return
 
 	switch(href_list["action"])
@@ -373,4 +412,5 @@
 
 		if ("dispose")
 			dispose()
+	updateUsrDialog()
 	return
