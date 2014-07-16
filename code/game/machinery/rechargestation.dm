@@ -2,19 +2,48 @@
 	name = "cyborg recharging station"
 	icon = 'icons/obj/objects.dmi'
 	icon_state = "borgcharger0"
-	density = 1
+//	density = 1
 	anchored = 1.0
 	use_power = 1
 	idle_power_usage = 5
 	active_power_usage = 1000
 	var/mob/occupant = null
 
+	density = 0
+
+	var/open = 1
+	var/construct_op = 0
+	var/circuitboard = "/obj/item/weapon/circuitboard/cyborgrecharger"
+	var/locked = 1
+	req_access = list(access_robotics)
+	var/recharge_speed
+	var/repairs
+
 
 
 	New()
 		..()
+	//---------------------------------------------------
+		component_parts = list()
+		component_parts += new /obj/item/weapon/circuitboard/cyborgrecharger(null)
+		component_parts += new /obj/item/weapon/stock_parts/capacitor(null)
+		component_parts += new /obj/item/weapon/stock_parts/capacitor(null)
+		component_parts += new /obj/item/weapon/stock_parts/manipulator(null)
+		component_parts += new /obj/item/weapon/cell/high(null)
+		RefreshParts()
+	//---------------------------------------------------
 		build_icon()
-
+	//---------------------------------------------------
+	RefreshParts()
+		recharge_speed = 0
+		repairs = 0
+		for(var/obj/item/weapon/stock_parts/capacitor/C in component_parts)
+			recharge_speed += C.rating * 100
+		for(var/obj/item/weapon/stock_parts/manipulator/M in component_parts)
+			repairs += M.rating - 1
+		for(var/obj/item/weapon/cell/C in component_parts)
+			recharge_speed *= C.maxcharge / 10000
+	//---------------------------------------------------
 	process()
 		if(!(NOPOWER|BROKEN))
 			return
@@ -46,10 +75,13 @@
 	proc
 		build_icon()
 			if(NOPOWER|BROKEN)
-				if(src.occupant)
-					icon_state = "borgcharger1"
-				else
+				if(open)
 					icon_state = "borgcharger0"
+				else
+					if(occupant)
+						icon_state = "borgcharger1"
+					else
+						icon_state = "borgcharger2"
 			else
 				icon_state = "borgcharger0"
 
@@ -81,6 +113,7 @@
 			build_icon()
 			src.use_power = 1
 			return
+
 
 	verb
 		move_eject()
@@ -120,3 +153,63 @@
 			build_icon()
 			src.use_power = 2
 			return
+
+
+	attack_paw(user as mob)
+		return attack_hand(user)
+
+	attack_ai(user as mob)
+		return attack_hand(user)
+
+	attackby(obj/item/P as obj, mob/user as mob)
+		if(open)
+			if(default_deconstruction_screwdriver(user, "borgdecon2", "borgcharger0", P))
+				return
+
+		if(exchange_parts(user, P))
+			return
+
+		default_deconstruction_crowbar(P)
+
+	attack_hand(user as mob)
+		if(..())	return
+		if(construct_op == 0)
+			toggle_open()
+		else
+			user << "The recharger can't be closed in this state."
+		add_fingerprint(user)
+
+	proc
+		toggle_open()
+			if(open)
+				close_machine()
+			else
+				open_machine()
+
+	open_machine()
+		if(occupant)
+			if (occupant.client)
+				occupant.client.eye = occupant
+				occupant.client.perspective = MOB_PERSPECTIVE
+			occupant.loc = loc
+			occupant = null
+			use_power = 1
+		open = 1
+		density = 0
+		build_icon()
+
+	close_machine()
+		if(!panel_open)
+			for(var/mob/living/silicon/robot/R in loc)
+				R.stop_pulling()
+				if(R.client)
+					R.client.eye = src
+					R.client.perspective = EYE_PERSPECTIVE
+				R.loc = src
+				occupant = R
+				use_power = 2
+				add_fingerprint(R)
+				break
+			open = 0
+			density = 1
+			build_icon()
