@@ -5,10 +5,10 @@
 	floor_tile = null
 	intact = 0
 
-/turf/simulated/floor/plating/winturf/New(turf/location as turf)
-	new/obj/structure/grille(locate(location.x, location.y, location.z))
-	var/obj/structure/window/reinforced/WIN = new/obj/structure/window/reinforced(locate(location.x, location.y, location.z))
-	WIN.dir = NORTHWEST
+	New(turf/location as turf)
+		new/obj/structure/grille(locate(location.x, location.y, location.z))
+		var/obj/structure/window/reinforced/WIN = new/obj/structure/window/reinforced(locate(location.x, location.y, location.z))
+		WIN.dir = NORTHWEST
 
 /turf/simulated/floor/plating/door
 	name = "plating"
@@ -16,8 +16,8 @@
 	floor_tile = null
 	intact = 0
 
-/turf/simulated/floor/door/New(turf/location as turf)
-	new/obj/machinery/door/airlock(locate(location.x, location.y, location.z))
+	New(turf/location as turf)
+		new/obj/machinery/door/airlock(locate(location.x, location.y, location.z))
 //-----------------------------------------------------------------------------//-----------------------------------------------------------------------------
 
 /obj/item/weapon/Mega_Build_Tool
