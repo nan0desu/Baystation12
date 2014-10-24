@@ -1,18 +1,24 @@
-/turf/Del
+/obj/mark/Del
 	New()
 		if (contents.len)
 			for(var/obj/I in src.contents)
 				del(I)
 		new /turf/space (src.loc)
+		
+		spawn(1)
+			del(src)
 
-/turf/P_Del
+/obj/mark/P_Del
 	New()
 		if (contents.len)
 			for(var/obj/I in src.contents)
 				del(I)
 		new /turf/simulated/floor/plating (src.loc)
+		
+		spawn(1)
+			del(src)
 
-/turf/Window
+/obj/mark/Window
 
 	icon = 'icons/obj/structures.dmi'
 	icon_state = "rwindow0"
@@ -24,14 +30,20 @@
 		W.dir = 9
 
 		new /turf/simulated/floor/plating (src.loc)
+		
+		spawn(1)
+			del(src)
 
-/turf/Door
+/obj/mark/Door
 
 	icon = 'icons/obj/doors/Doorint.dmi'
 	icon_state = "door_closed"
 
 	New()
 		new /obj/machinery/door/airlock (src.loc)
+		
+		spawn(1)
+			del(src)
 
 /obj/Mega_Build_Tool
 	icon = 'musician.dmi'
@@ -48,7 +60,7 @@
 	var/list/A ()
 	var/list/B ()
 
-	var/LG = "1 /turf/simulated/wall\n2 /turf/simulated/floor/plating\n3 /turf/Window\n4 /turf/Door"
+	var/LG = "1 /turf/simulated/wall\n2 /turf/simulated/floor/plating\n3 /obj/mark/Window\n4 /obj/mark/Door"
 	var/list/LeG ()
 	LeG = list ("1", /turf/wall, 'wall.dmi', "2", /turf/floor, 'floor.dmi', "3", /turf/glass, 'glass.dmi')
 /*
