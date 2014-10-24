@@ -130,7 +130,7 @@
 							dat += "<IMG CLASS=icon SRC=\ref[o]>"
 							// ICONSTATE='[usr.icon_state]'>"
 						else
-							dat += "<IMG CLASS=icon SRC=\ref['areas.dmi']>"
+							dat += "<IMG CLASS=icon SRC=\ref['icons/turf/areas.dmi']>"
 
 					dat += "<br>"
 					del(B)
