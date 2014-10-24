@@ -198,7 +198,11 @@
 					T.ChangeTurf(/turf/simulated/wall/r_wall)
 					return
 			else if(pa.Find("right"))
-				if(istype(object,/turf/simulated/wall))
+				if(istype(object,/turf/simulated/wall/r_wall))
+					var/turf/T = object
+					T.ChangeTurf(/turf/simulated/wall)
+					return			
+				else if(istype(object,/turf/simulated/wall))
 					var/turf/T = object
 					T.ChangeTurf(/turf/simulated/floor)
 					return
@@ -206,16 +210,12 @@
 					var/turf/T = object
 					T.ChangeTurf(/turf/space)
 					return
-				else if(istype(object,/turf/simulated/wall/r_wall))
-					var/turf/T = object
-					T.ChangeTurf(/turf/simulated/wall)
-					return
 				else if(istype(object,/obj))
 					del(object)
 					return
-			else if(istype(object,/turf) && pa.Find("alt") && pa.Find("left"))
+			else if(pa.Find("alt") && pa.Find("left"))
 				new/obj/machinery/door/airlock(get_turf(object))
-			else if(istype(object,/turf) && pa.Find("ctrl") && pa.Find("left"))
+			else if(pa.Find("ctrl") && pa.Find("left"))
 				switch(holder.builddir.dir)
 					if(NORTH)
 						var/obj/structure/window/reinforced/WIN = new/obj/structure/window/reinforced(get_turf(object))
