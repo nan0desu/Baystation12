@@ -125,10 +125,10 @@
 					for(var/i = 1,i <= DrX, i++)
 
 						if (LeG.Find(grid [i][u],1,0))
-							var/o = LeG [LeG.Find(grid [i][u],1,0) + 2]
+							var/icon/sprite = new /icon("[LeG [LeG.Find(grid [i][u],1,0) + 2]]", "[LeG [LeG.Find(grid [i][u],1,0) + 3]]")
+							usr << browse_rsc(sprite, "[LeG [LeG.Find(grid [i][u],1,0)]].png")
 
-							dat += "<IMG CLASS=icon SRC=\ref[o]>"
-							// ICONSTATE='[usr.icon_state]'>"
+							dat += "<img src='[LeG [LeG.Find(grid [i][u],1,0)]].png'>"
 						else
 							dat += "<IMG CLASS=icon SRC=\ref['icons/turf/areas.dmi']>"
 
